@@ -23,8 +23,9 @@ Une fois les bons chemins relatifs mis à jour (cf. plus bas) vous pouvez:
 `make circuit sim`
 
 Pour que cela fonctionne, il faut évidemment qu'il connaisse les chemins vers votre carotte.py et votre simulateur. 
-Par défaut, les chemins sont correct pour le cas où vous n'avez pas modifié le dossier du simulateur et que vous y avez placé ce projet de sorte à avoir ces dossiers dans un même répertoire :
+Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte.
 - carotte.py
 - Sysnum_microprocessor
-- tp1
+- Netlist_simulator
+avec le fichier carotte.py dans le dossier carotte.py et le fichier netlist_simulator.byte dans le dossier Netlist_simulator. 
 Si ce n'est pas le cas, vous pouvez regarder les 3 premières lignes du fichier Makefile et les mettre à jour. 
