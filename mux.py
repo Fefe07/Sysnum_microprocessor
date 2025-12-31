@@ -12,9 +12,7 @@ def bit_mux(sel, a) :
     assert sel.bus_size == 1
     assert a.bus_size % 2 == 0
     mid = a.bus_size//2 
-    branch0 = n_and(clone(mid, ~sel), a[:mid])
-    branch1 = n_and(clone(mid, sel),  a[mid:])
-    return n_or(branch0, branch1)
+    return Mux(sel, a[:mid], a[mid:])
 
 def mux(sel, a):
     if sel.bus_size == 1 :
