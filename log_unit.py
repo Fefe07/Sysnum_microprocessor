@@ -14,30 +14,11 @@ def concat(l):
 def clone(n, x):
     return concat(n*[x])
 
-def n_binop(f_op, a, b) :
-    assert a.bus_size == b.bus_size
-    n = a.bus_size
-    res_bits = [f_op(a[i], b[i]) for i in range(n)]
-    s = concat(res_bits)
-    return s
-
-def n_or(a,b):
-    return n_binop(lambda x,y : x | y, a, b)
-
-def n_and(a,b):
-    return n_binop(lambda x,y : x & y, a, b)
-
-def n_xor(a,b):
-    return n_binop(lambda x,y : x ^ y, a, b)
-
-def n_not(a):
-    return concat([~a[i] for i in range(a.bus_size)])
-
 def multi_binop(f_op, a):
     assert a.bus_size >= 2
     if a.bus_size == 2 :
         return f_op(a[0], a[1])
-    return f_op(a[0], multi_binop(a[1:]) )
+    return f_op(a[0], multi_binop(f_op, a[1:]) )
 
 def b_and(a):
     return multi_binop(lambda x,y : x & y, a)
@@ -50,20 +31,32 @@ def simple_left_shift(a):
     return Constant("0")+a[:n-1]
 
 def main() -> None :
+    allow_ribbon_logic_operations(True)
+
     n = 4
     a = Input(n)
     b = Input(n)
-    n_or(a,b).set_as_output("r_or")
-    n_and(a,b).set_as_output("r_and")
-    n_xor(a,b).set_as_output("r_xor")
-    n_not(a).set_as_output("r_not")
-    simple_left_shift(a).set_as_output("r_shift")
+
+    simple_left_shift(a).set_as_output("r_lshift_a")
+    b_and(a).set_as_output("bug_and_a")
+    b_or(b).set_as_output("bug_or_b")
 
 # Example:
-# a ? 0b1100
-# b ? 0b1010
-# => r_or = 14 (0b1110)
-# => r_and = 8 (0b1000)
-# => r_xor = 6 (0b0110)
-# => r_not = 3 (0b0011)
-# => r_shift = 8 (0b1000)
+# Step 1 :
+# a ? 0b1101
+# b ? 0b1000
+# => r_lshift_a = 10 (0b1010)
+# => bug_and_a = 0 (0b0)
+# => bug_and_b = 1 (0b1)
+# Step 2 :
+# a ? 0b1111
+# b ? 0b0000
+# => r_lshift_a = 14 (0b1110)
+# => bug_and_a = 1 (0b1)
+# => bug_and_b = 0 (0b0)
+# Step 3 :
+# a ? 0b0111
+# b ? 0b1000
+# => r_lshift_a = 14 (0b1110)
+# => bug_and_a = 0 (0b0)
+# => bug_and_b = 1 (0b1)

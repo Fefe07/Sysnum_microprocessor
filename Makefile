@@ -10,6 +10,9 @@ SIMULATOR = ./../Netlist_simulator/netlist_simulator.byte # Mettez le chemin ver
 sim :
 	$(SIMULATOR) ./build/current.net
 
+all :
+	make alu log_unit arith_unit demux mux program_counter regs
+
 clean :
 	rm -rf ./build/
 	rm -rf ./__pycache__/

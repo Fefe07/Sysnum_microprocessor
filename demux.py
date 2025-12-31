@@ -5,13 +5,15 @@
 from lib_carotte import *
 from typing import *
 
-from log_unit import n_and, clone
+from log_unit import clone
 
 def bit_demux(sel, inp):
     ''' 1-bit demultiplexer '''
     assert sel.bus_size == 1
+    allow_ribbon_logic_operations(True)
+    
     n = inp.bus_size
-    return [ n_and(clone(n,~sel), inp) ] + [ n_and(clone(n,sel), inp) ] 
+    return [ clone(n,~sel) & inp ] + [ clone(n,sel) & inp ] 
     
 
 def demux(sel, inp):

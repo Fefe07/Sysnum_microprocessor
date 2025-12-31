@@ -5,7 +5,7 @@
 from lib_carotte import *
 from typing import *
 
-from log_unit import n_and, clone, n_or, concat
+from log_unit import clone, concat
 from demux import demux
 
 def bit_mux(sel, a) :
