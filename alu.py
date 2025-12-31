@@ -27,7 +27,7 @@ def alu(a, b, op):
     and_or  = demux(op[0], n_and(a,b)+n_or(a,b))
     not_xor = demux(op[0], n_not(b)+n_xor(a,b))
     zero_zero = Constant(n*"0")
-    return demux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero)
+    return demux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero) , overflow & ~op[1] & ~op[2] 
 
 def main() -> None:
     '''Entry point of this example'''
@@ -35,7 +35,7 @@ def main() -> None:
     a = Input(n)
     b = Input(n)
     op = Input(3)
-    alu(a, b, op).set_as_output("r")
+    alu(a, b, op)[0].set_as_output("r")
 
 # Exemples:
 
