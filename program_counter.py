@@ -6,7 +6,7 @@
 from lib_carotte import *
 from typing import *
 
-from demux import demux
+from mux import mux
 from arith_unit import adder
 from log_unit import concat
 
@@ -14,8 +14,8 @@ def program_counter(branch_in, branch_en) :
     assert branch_en.bus_size == 1
     n = branch_in.bus_size
     pc = concat([Reg(Defer(1, lambda i = i : data_in[i]))  for i in range(n) ])
-    next_pc = adder(pc, Constant("1"+(n-1)*"0"), Constant("0"))[0]
-    data_in = demux(branch_en, next_pc+branch_in)
+    next_pc, overflow = adder(pc, Constant("1"+(n-1)*"0"), Constant("0"))
+    data_in = mux(branch_en, next_pc+branch_in)
     return pc
 
 def main():

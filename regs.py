@@ -7,14 +7,14 @@ from lib_carotte import *
 from typing import *
 
 from log_unit import concat
-from demux import demux
 from mux import mux
+from demux import demux
 
 def register(data_in, write_en):
     assert write_en.bus_size == 1
     n = data_in.bus_size
     reg = concat([ Reg(Defer(1, lambda i=i : reg_in[i])) for i in range(n) ])
-    reg_in = demux(write_en, reg+data_in)
+    reg_in = mux(write_en, reg+data_in)
     return reg
 
 def registers(write_select, data_in, read_select) :
@@ -22,10 +22,10 @@ def registers(write_select, data_in, read_select) :
     nb_bit_sel_reg = write_select.bus_size
     nb_regs = 2**nb_bit_sel_reg
     reg_size = data_in.bus_size
-    write_en_signals = mux(write_select, Constant("1"))
+    write_en_signals = demux(write_select, Constant("1"))
     assert len(write_en_signals) == nb_regs
     regs = [Constant(reg_size*"0")] +[register(data_in, write_en_signals[i]) for i in range(1, nb_regs)]
-    return demux(read_select, concat(regs))
+    return mux(read_select, concat(regs))
 
 def main():
     n = 8

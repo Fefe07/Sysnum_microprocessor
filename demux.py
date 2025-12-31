@@ -1,39 +1,46 @@
 ################################################################################
-######################      DEMULTIPLEXER         ##############################
+######################      DEMULTIPLEXER       ################################
 ################################################################################
 
 from lib_carotte import *
 from typing import *
 
-from log_unit import n_and, clone, n_or, concat
-from mux import mux
+from log_unit import n_and, clone
 
-def bit_demux(sel, a) :
+def bit_demux(sel, inp):
+    ''' 1-bit demultiplexer '''
     assert sel.bus_size == 1
-    assert a.bus_size % 2 == 0
-    mid = a.bus_size//2 
-    branch0 = n_and(clone(mid, ~sel), a[:mid])
-    branch1 = n_and(clone(mid, sel),  a[mid:])
-    return n_or(branch0, branch1)
+    n = inp.bus_size
+    return [ n_and(clone(n,~sel), inp) ] + [ n_and(clone(n,sel), inp) ] 
+    
 
-def demux(sel, a):
-    if sel.bus_size == 1 :
-        return bit_demux(sel, a)
-    return demux(sel[1:], bit_demux(sel[0], a))
+def demux(sel, inp):
+    ''' n-bit demultiplexer '''
+    n = sel.bus_size
+    if n == 1 :
+        return bit_demux(sel, inp)
+    first_res = bit_demux(sel[0], inp)
+    branch0 = first_res[0]
+    branch1 = first_res[1]
+    rest_sel = sel[1:]
+    return demux(rest_sel, branch0) + demux(rest_sel, branch1)
 
+def main() :
+    sel = Input(3)
+    inp = Input(3)
+    l = demux(sel, inp)
+    for i in range(len(l)):
+        l[i].set_as_output("r_"+str(i))
 
-def main():
-    sel = Input(2)
-    a = Input(8)
-
-    demux(sel, a).set_as_output("r") 
-    demux(sel, concat(mux(sel, a))).set_as_output("id") # devrait donner la même chose que "a"
-    concat(mux(sel, demux(sel, a))).set_as_output("p")  # devrait juste mettre les bits non sélectionnées à 0 
-
-# Exemple :
+# Exemple
 # Step 1 :
-# sel ? 3
-# a ? 0b11100100
-# => r = 3 (0b11)
-# => id = 228 (0b11100100)
-# => p = 192 (0b11000000)
+# sel ? 5
+# inp ? 0b101
+# => r_0 = 0 (0b000)
+# => r_1 = 0 (0b000)
+# => r_2 = 0 (0b000)
+# => r_3 = 0 (0b000)
+# => r_4 = 0 (0b000)
+# => r_5 = 5 (0b101)
+# => r_6 = 0 (0b000)
+# => r_7 = 0 (0b000)
