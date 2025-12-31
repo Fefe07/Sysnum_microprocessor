@@ -31,8 +31,6 @@ def simple_left_shift(a):
     return Constant("0")+a[:n-1]
 
 def main() -> None :
-    allow_ribbon_logic_operations(True)
-
     n = 4
     a = Input(n)
     b = Input(n)

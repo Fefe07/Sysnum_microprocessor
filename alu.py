@@ -16,9 +16,12 @@ from mux import mux
 # 4 -> not b
 # 5 -> xor
 # 6,7 -> 0 
+
 def alu(a, b, op):
     assert a.bus_size == b.bus_size
     assert op.bus_size == 3
+    allow_ribbon_logic_operations(True)
+
     n = a.bus_size
     add_sub, overflow = arith_unit( a, b, op[0] ) 
     and_or  = mux(op[0], (a & b) + (a|b) )
@@ -28,7 +31,6 @@ def alu(a, b, op):
 
 def main() -> None:
     '''Entry point of this example'''
-    allow_ribbon_logic_operations(True)
 
     n = 8
     a = Input(n)
