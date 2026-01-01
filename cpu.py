@@ -13,33 +13,43 @@ from alu import alu
 
 def decoder(instruction):
     x = instruction
-    return x[:5],x[5:10],x[10:21], x[21:24], x[24:25]
+    sizes = [5, 5, 5, 10, 3, 1, 1, 1, 1]
+    positions = [32 for _ in range(len(sizes) + 1)]
+    for i in range(len(sizes)):
+        positions[i+1] = positions[i] - sizes[i]
+    assert positions[-1] == 0
+    return (x[positions[i+1]:positions[i]] for i in range(len(sizes)))
 
 def cpu():
     allow_ribbon_logic_operations(True)
+    
     n = 32
+    data_size = n
     instruction_size = 32
-    rom_addr_size = 5 
-    branch_in = Constant(n*"0")
-    branch_en = Constant("0")
+    rom_addr_size = 10 
+    ram_addr_size = 10
+
+    branch_in = Defer(n, lambda: result)
+    branch_en = Defer(1, lambda: is_branch)
     pc = program_counter(branch_in, branch_en)
     instruction = ROM(rom_addr_size, instruction_size, pc[:rom_addr_size])
-    ra,rb,imm,op,is_imm = decoder(instruction)
-    data_in = Defer(n, lambda:result) 
-    values = registers(rb, data_in, [ra, rb])
-    va = values[0]
-    vb = values[1]
+    rs1,rs2,rd,imm,op,is_imm, write_to_ram, read_from_ram, is_branch = decoder(instruction)
+    data_in = Defer(n, lambda:new_rd) 
+    values = registers(rd, data_in, [rs1, rs2])
+    vs1 = values[0]
+    vs2 = values[1]
     completed_imm = imm + Constant((n-imm.bus_size)*"0")
-    v1 = mux(is_imm, va+completed_imm)
-    v2 = vb
-    (result, overflow) = alu(v1, v2, op)
-    return v1,v2, pc, ra 
-
+    va = mux(is_imm, vs1+completed_imm)
+    vb = vs2
+    (result, overflow) = alu(va, vb, op)
+    data = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs1)
+    new_rd = mux(read_from_ram, result+data)
+    return va, vb
 
 def main() :
-    v1,v2, pc, ra = cpu()
+    v1,v2 = cpu()
     v1.set_as_output("v1")
     v2.set_as_output("v2")
-    pc.set_as_output("pc")
-    ra.set_as_output("ra")
+    # pc.set_as_output("pc")
+    # ra.set_as_output("ra")
 
