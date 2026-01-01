@@ -5,7 +5,8 @@
 from lib_carotte import *
 from typing import *
 
-from log_unit import n_xor, concat
+from log_unit import concat
+
 
 def full_adder(a: Variable, b: Variable, c: Variable) -> Tuple[Variable, Variable]:
     '''1-bit full adder'''
@@ -15,6 +16,7 @@ def full_adder(a: Variable, b: Variable, c: Variable) -> Tuple[Variable, Variabl
 def adder(a: Variable, b: Variable, c_in: Variable) -> Tuple[Variable, Variable] :
     '''n-bit full adder'''
     assert a.bus_size == b.bus_size
+    
     n = a.bus_size
     s,c_out = full_adder(a[0],b[0], c_in)
     for i in range(1, n):
@@ -27,14 +29,18 @@ def arith_unit(a, b, is_sub) :
     # Ne prend en entrées que des entiers non signés ?
     assert a.bus_size == b.bus_size
     assert is_sub.bus_size == 1
+    allow_ribbon_logic_operations(True)
+
     n = a.bus_size
     n_is_sub = concat(n*[is_sub])
-    conditioned_not_b = n_xor(b, n_is_sub)
+    conditioned_not_b = b ^ n_is_sub
     (s, overflow) = adder(a, conditioned_not_b, is_sub)
     return (s, overflow)
 
 def main() -> None:
     '''Entry point of this example'''
+    allow_ribbon_logic_operations(True)
+
     n = 4
     a = Input(n)
     b = Input(n)

@@ -2,14 +2,11 @@
 ###############        ARITHMETIC AND LOGIC UNIT         #######################
 ################################################################################
 
-
 from lib_carotte import *
 from typing import *
 
 from arith_unit import arith_unit
-from log_unit import n_and, n_or, n_not, n_xor
-# from mux import mux
-from demux import demux
+from mux import mux
 
 # opérations actuelles ( va sûrement changer ! )
 # 0 -> add
@@ -19,23 +16,27 @@ from demux import demux
 # 4 -> not b
 # 5 -> xor
 # 6,7 -> 0 
+
 def alu(a, b, op):
     assert a.bus_size == b.bus_size
     assert op.bus_size == 3
+    allow_ribbon_logic_operations(True)
+
     n = a.bus_size
-    add_sub, overflow = arith_unit(a,b,op[0]) 
-    and_or  = demux(op[0], n_and(a,b)+n_or(a,b))
-    not_xor = demux(op[0], n_not(b)+n_xor(a,b))
+    add_sub, overflow = arith_unit( a, b, op[0] ) 
+    and_or  = mux(op[0], (a & b) + (a|b) )
+    not_xor = mux(op[0], ( ~b )+ (a ^ b) )
     zero_zero = Constant(n*"0")
-    return demux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero)
+    return mux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero) , overflow & ~op[1] & ~op[2] 
 
 def main() -> None:
     '''Entry point of this example'''
+
     n = 8
     a = Input(n)
     b = Input(n)
     op = Input(3)
-    alu(a, b, op).set_as_output("r")
+    alu(a, b, op)[0].set_as_output("r")
 
 # Exemples:
 
@@ -74,3 +75,15 @@ def main() -> None:
 # b ? 0b10101001
 # op ? 5
 # => r = 101 (0b01100101)
+
+# op 6 :
+# a ? 0b11001100
+# b ? 0b10101001
+# op ? 6
+# => r = 0 (0b00000000)
+
+# op 7 :
+# a ? 0b11001100
+# b ? 0b10101001
+# op ? 7
+# => r = 0 (0b00000000)
