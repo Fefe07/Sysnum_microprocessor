@@ -5,7 +5,7 @@
 from lib_carotte import *
 from typing import *
 
-from arith_unit import adder
+from arith_unit import adder, arith_unit
 from log_unit import clone
 
 def multipliy(a, b):
@@ -25,8 +25,28 @@ def multipliy(a, b):
     assert s.bus_size == a.bus_size+b.bus_size
     return s
 
+def multiplier(a,b,is_signed):
+    assert a.bus_size == b.bus_size and a.bus_size > 2
+    assert is_signed.bus_size == 1
+    n = a.bus_size
+
+    sa = a[n-1]
+    sb = b[n-1]
+    ra = a[:n-1]
+    rb = b[:n-1]
+    low = multipliy(ra, rb)
+    (s_mid,overflow) = adder(clone(n-1,sb) & ra, clone(n-1,sa) & rb , Constant("0"))
+    middle = s_mid+overflow
+    s = sa & sb
+
+    positive_part = low + s + Constant("0") 
+    signed_part = Constant((n-1)*"0") + middle + Constant("0")
+    (res, overflow) =  arith_unit(positive_part, signed_part, is_signed)
+    return res
+
 def main():
     a = Input(8)
     b = Input(8)
-    x = multipliy(a,b)
+    s = Input(1)
+    x = multiplier(a,b,s)
     x.set_as_output("r")
