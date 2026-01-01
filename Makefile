@@ -15,8 +15,7 @@ all :
 	make alu log_unit arith_unit demux mux program_counter regs
 
 update :
-	cd $(SIMULATOR_DIR)
-	make build
+	make -C $(SIMULATOR_DIR) build
 
 clean :
 	rm -rf ./build/
