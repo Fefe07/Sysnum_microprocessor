@@ -18,7 +18,7 @@ def decoder(instruction):
     for i in range(len(sizes)):
         positions[i+1] = positions[i] - sizes[i]
     assert positions[-1] == 0
-    return (x[positions[i+1]:positions[i]] for i in range(len(sizes)))
+    return tuple(x[positions[i+1]:positions[i]] for i in range(len(sizes)))
 
 def cpu():
     allow_ribbon_logic_operations(True)
@@ -35,9 +35,7 @@ def cpu():
     instruction = ROM(rom_addr_size, instruction_size, pc[:rom_addr_size])
     rs1,rs2,rd,imm,op,is_imm, write_to_ram, read_from_ram, is_branch = decoder(instruction)
     data_in = Defer(n, lambda:new_rd) 
-    values = registers(rd, data_in, [rs1, rs2])
-    vs1 = values[0]
-    vs2 = values[1]
+    vs1, vs2 = registers(rd, data_in, [rs1, rs2])
     completed_imm = imm + Constant((n-imm.bus_size)*"0")
     va = mux(is_imm, vs1+completed_imm)
     vb = vs2

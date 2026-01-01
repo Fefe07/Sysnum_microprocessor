@@ -28,7 +28,7 @@ def registers(write_select, data_in, read_select_list) :
     write_en_signals = demux(write_select, Constant("1"))
     assert len(write_en_signals) == nb_regs
     regs = [Constant(reg_size*"0")] +[register(data_in, write_en_signals[i]) for i in range(1, nb_regs)]
-    return [mux(read_select, concat(regs)) for read_select in read_select_list]
+    return tuple(mux(read_select, concat(regs)) for read_select in read_select_list)
 
 def main():
     n = 8
