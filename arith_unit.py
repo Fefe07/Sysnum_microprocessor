@@ -24,6 +24,7 @@ def adder(a: Variable, b: Variable, c_in: Variable) -> Tuple[Variable, Variable]
 
 def arith_unit(a, b, is_sub) :
     ''' adder and susbtractor unit '''
+    # Ne prend en entrées que des entiers non signés ?
     assert a.bus_size == b.bus_size
     assert is_sub.bus_size == 1
     n = a.bus_size
