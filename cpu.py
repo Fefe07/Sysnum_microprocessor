@@ -37,7 +37,7 @@ def cpu():
     completed_imm = imm + Constant((n-imm.bus_size)*"0")
     va = mux(is_imm, vs1+completed_imm)
     vb = vs2
-    (result, overflow) = alu(va, vb, op)
+    result, eq, lt, ltu = alu(va, vb, op)
     data = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs1)
     new_rd = mux(read_from_ram, result+data)
     return va, vb

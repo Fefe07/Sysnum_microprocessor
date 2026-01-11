@@ -5,8 +5,10 @@
 from lib_carotte import *
 from typing import *
 
-from arith_unit import arith_unit
+from arith_unit import arith_unit, adder 
 from mux import mux
+from log_unit import b_or
+from flags import flags
 
 # opérations actuelles ( va sûrement changer ! )
 # 0 -> add
@@ -16,27 +18,39 @@ from mux import mux
 # 4 -> not b
 # 5 -> xor
 # 6,7 -> 0 
-
 def alu(a, b, op):
     assert a.bus_size == b.bus_size
     assert op.bus_size == 3
     allow_ribbon_logic_operations(True)
+    n = a.bus_size
 
     n = a.bus_size
-    add_sub, overflow = arith_unit( a, b, op[0] ) 
+    add_sub, carry = arith_unit( a, b, op[0] ) 
     and_or  = mux(op[0], (a & b) + (a|b) )
     not_xor = mux(op[0], ( ~b )+ (a ^ b) )
     zero_zero = Constant(n*"0")
-    return mux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero) , overflow & ~op[1] & ~op[2] 
+    res = mux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero)
+    
+    EQ, LTU, LT = flags(a, b, res, carry)
+
+    return res, EQ, LTU, LT
 
 def main() -> None:
     '''Entry point of this example'''
+    allow_ribbon_logic_operations(True)
 
-    n = 8
-    a = Input(n)
-    b = Input(n)
-    op = Input(3)
-    alu(a, b, op)[0].set_as_output("r")
+    n = 4
+    a, ov = adder(Reg(Defer(n, lambda: a)), Constant(n*"0"), Constant("1"))
+    b, _ = adder(Reg(Defer(n, lambda: b)), Constant(n*"0"), ov)
+    op = Constant("100")
+    res, eq, ltu, lt = alu(a, b, op)
+    a.set_as_output("a")
+    b.set_as_output("b")
+    res.set_as_output("res")
+    eq.set_as_output("eq")
+    lt.set_as_output("lt")
+    ltu.set_as_output("ltu")
+    
 
 # Exemples:
 
