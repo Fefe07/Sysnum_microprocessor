@@ -6,7 +6,6 @@ from lib_carotte import *
 from typing import *
 
 from arith_unit import adder
-from program_counter import program_counter
 from regs import registers
 from mux import mux
 from alu import alu
@@ -28,14 +27,13 @@ def cpu():
     instruction_size = 32
     rom_addr_size = 10 
     ram_addr_size = 10
+    # reg_addr_size = 5
 
-    branch_in = Defer(n, lambda: result)
     branch_en = Defer(1, lambda: is_branch)
-    pc = program_counter(branch_in, branch_en)
+    data_in = Defer(n, lambda: new_rd) 
+    (vs1, vs2, pc) = registers(Defer(5, lambda:rd), data_in, [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], branch_en)
     instruction = ROM(rom_addr_size, instruction_size, pc[:rom_addr_size])
     rs1,rs2,rd,imm,op,is_imm, write_to_ram, read_from_ram, is_branch = decoder(instruction)
-    data_in = Defer(n, lambda:new_rd) 
-    vs1, vs2 = registers(rd, data_in, [rs1, rs2])
     completed_imm = imm + Constant((n-imm.bus_size)*"0")
     va = mux(is_imm, vs1+completed_imm)
     vb = vs2
