@@ -9,16 +9,38 @@ from arith_unit import adder
 from regs import registers
 from mux import mux
 from alu import alu
-from log_unit import b_or
+from log_unit import b_or, clone
 
-def decoder(instruction):
-    x = instruction
-    sizes = [5, 5, 5, 8, 3, 1, 1, 1, 3]
-    positions = [32 for _ in range(len(sizes) + 1)]
-    for i in range(len(sizes)):
-        positions[i+1] = positions[i] - sizes[i]
-    assert positions[-1] == 0
-    return tuple(x[positions[i+1]:positions[i]] for i in range(len(sizes)))
+def extend_sign(x):
+    n = x.bus_size
+    return  x + clone(32-n, x[n-1])
+
+def decoder(x):
+    funct7 = x[25:32]
+    rs2 = x[20:25] # A CHANGER POUR U et J type
+    rs1 = x[15:20]
+    rd_bits = x[7:12]
+    funct3 = x[12:15]
+    opcode = x[0:7]
+
+    imm_I = extend_sign(x[20:32])
+    imm_S = extend_sign(x[7:12]+x[25:32])
+    imm_B = extend_sign(x[7:12]+x[25:32])
+    imm_U = Constant(12*"0") + x[12:32]
+    imm_J = extend_sign(x[12:32])
+
+    is_jmp = opcode[0]
+    is_branch = opcode[1]
+    is_imm = opcode[2]
+    read_from_ram = opcode[3]
+    write_to_ram = opcode[4]
+    
+    op = Mux(is_branch, funct3, Constant("100"))
+    condition = Mux(is_branch, Mux(is_jmp, Constant("000"),Constant("001")), funct3)
+    rd = Mux(is_branch | write_to_ram, rd_bits, Constant("00000"))
+
+    imm = Mux(is_jmp | is_branch, Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B))
+    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition
 
 def cpu():
     allow_ribbon_logic_operations(True)
@@ -30,27 +52,29 @@ def cpu():
     ram_addr_size = 10
     # reg_addr_size = 5
 
-    branch_en = Defer(1, lambda: condition_met )
-    data_in = Defer(n, lambda: new_rd) 
-    (vs1, vs2, pc) = registers(Defer(5, lambda:rd), data_in, [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], branch_en)
+    vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], Defer(1, lambda: condition_met ))
     instruction = ROM(rom_addr_size, instruction_size, pc[:rom_addr_size])
-    rs1,rs2,rd,imm,op,is_imm, write_to_ram, read_from_ram, condition = decoder(instruction)
+    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition = decoder(instruction)
     
-    completed_imm = imm + Constant((n-imm.bus_size)*"0")
-    is_branch = b_or(condition)
-    va = mux(is_imm, vs1+completed_imm)
-    vb = vs2
-    result, eq, lt, ltu = alu(va, vb, op)
+    is_conditional_branch = b_or(condition[1:])
+    va = vs1
+    vb = mux(is_imm, vs2 + imm) 
+
+    result, eq, ltu, lt = alu(va, vb, op)
+    # conditions : NEVER = 000  ALWAYS = 001  LT = 010  GE = 011  EQ = 100  NEQ = 101  LTU = 110  GEU = 111       
     condition_met = condition[0] ^ (mux(condition[1:], Constant("0")+eq+lt+ltu))
-    data = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs1)
-    new_rd = mux(read_from_ram, mux(is_branch, result+completed_imm)+data)
-    return va, vb, pc, condition_met
+    # reads from /writes vs1 to the adress result (modulo the size of the ram)  - it writes if write_to_ram = 1
+    data_from_ram = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs1)
+    data_in_regs = mux(read_from_ram, mux(is_conditional_branch, result+imm) + data_from_ram)
+    
+    return rd, va, vb, pc, condition_met, data_in_regs 
 
 def main() :
-    v1,v2, pc, is_jmp = cpu()
+    rd, v1,v2, pc, is_jmp, result = cpu()
     v1.set_as_output("v1")
     v2.set_as_output("v2")
     pc.set_as_output("pc")
     is_jmp.set_as_output("jmp")
-    # ra.set_as_output("ra")
+    rd.set_as_output("rd")
+    result.set_as_output("alu_res")
 
