@@ -63,8 +63,8 @@ def cpu():
     result, eq, ltu, lt = alu(va, vb, op)
     # conditions : NEVER = 000  ALWAYS = 001  LT = 010  GE = 011  EQ = 100  NEQ = 101  LTU = 110  GEU = 111       
     condition_met = condition[0] ^ (mux(condition[1:], Constant("0")+eq+lt+ltu))
-    # reads from /writes vs1 to the adress result (modulo the size of the ram)  - it writes if write_to_ram = 1
-    data_from_ram = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs1)
+    # reads from /writes vs2 to the adress result (modulo the size of the ram)  - it writes if write_to_ram = 1
+    data_from_ram = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs2)
     data_in_regs = mux(read_from_ram, mux(is_conditional_branch, result+imm) + data_from_ram)
     
     return rd, va, vb, pc, condition_met, data_in_regs 
