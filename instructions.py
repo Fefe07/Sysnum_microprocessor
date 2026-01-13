@@ -48,7 +48,8 @@ def get_op(op):
 
         "mul" : 0,
         "mulhu": 1,
-        "mulh" : 3
+        "mulhsu" : 3,
+        "mulh" : 7
     }
     return get_number(ht[op], 3, False)
 
@@ -127,14 +128,14 @@ prog_fibo2 = [
     branch("ltu", 1, 3, 3)]
 
 prog_fact = [
-    mov_imm(1, 20),
+    mov_imm(1, -20),
     mov_imm(2, -1),
     mov_imm(3, -1),  
-    op_reg("mulhu",4, 2, 1),
+    op_reg("mulhsu",4, 1, 2),
     op_reg("mul", 2, 2, 1),
     op_reg("mul", 3, 3, 1),
     op_reg("add", 3, 3, 4),
-    op_imm("sub", 1, 1, 1),
+    op_imm("add", 1, 1, 1),
     branch("neq", 1, 0, 3)
 ]
 print_prog(prog_fact)

@@ -63,7 +63,7 @@ def cpu():
     vb = mux(is_imm, vs2 + imm) 
 
     alu_result, eq, ltu, lt = alu(va, vb, op)
-    mult_res = mux(op[0],  multiplier(va, vb, op[1]) if not DISABLE_MULTIPLICATION else Constant(64*"0") )
+    mult_res = mux(op[0],  multiplier(va, vb, op[1], op[2]) if not DISABLE_MULTIPLICATION else Constant(64*"0") )
     result = Mux(is_mult, alu_result, mult_res)
     # conditions : NEVER = 000  ALWAYS = 001  LT = 010  GE = 011  EQ = 100  NEQ = 101  LTU = 110  GEU = 111       
     condition_met = condition[0] ^ (mux(condition[1:], Constant("0")+eq+lt+ltu))

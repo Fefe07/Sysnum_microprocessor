@@ -25,28 +25,37 @@ def multipliy(a, b):
     assert s.bus_size == a.bus_size+b.bus_size
     return s
 
-def multiplier(a,b,is_signed):
+def multiplier(a,b,a_signed, b_signed):
     assert a.bus_size == b.bus_size and a.bus_size > 2
-    assert is_signed.bus_size == 1
+    assert b_signed.bus_size == a_signed.bus_size == 1
     n = a.bus_size
 
-    sa = a[n-1]
-    sb = b[n-1]
-    ra = a[:n-1]
-    rb = b[:n-1]
-    low = multipliy(ra, rb)
-    (s_mid,overflow) = adder(clone(n-1,sb) & ra, clone(n-1,sa) & rb , Constant("0"))
+    xa = Mux(a_signed, b, a)
+    xb = Mux(a_signed, a, b)
+    only_a_signed = a_signed ^ b_signed 
+    both_signed = a_signed & b_signed 
+
+    sa = xa[n-1]
+    sb = xb[n-1]
+    la = xa[:n-1]
+    lb = xb[:n-1]
+    
+    low = multipliy(la, lb)
+    s_mid, carry = arith_unit(clone(n-1,sb) & la, clone(n-1,sa) & lb , only_a_signed )
+    overflow = carry ^ only_a_signed
     middle = s_mid+overflow
     s = sa & sb
-
-    positive_part = low + s + Constant("0") 
-    signed_part = Constant((n-1)*"0") + middle + Constant("0")
-    (res, overflow) =  arith_unit(positive_part, signed_part, is_signed)
+    exterior_part = low + s + (s & only_a_signed)
+    middle_part = Constant((n-1)*"0") + middle + (overflow & only_a_signed)
+    
+    res, _ =  arith_unit(exterior_part, middle_part, both_signed)
+    assert res.bus_size == 2*n
     return res
 
 def main():
-    a = Input(8)
-    b = Input(8)
-    s = Input(1)
-    x = multiplier(a,b,s)
+    a = Input(4)
+    b = Input(4)
+    a_signed = Constant("0")
+    b_signed = Constant("0")
+    x = multiplier(a,b,a_signed, b_signed)
     x.set_as_output("r")
