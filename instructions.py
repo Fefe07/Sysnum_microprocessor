@@ -77,14 +77,14 @@ def get_condition(cond):
 def strb(b):
     return ("1" if b else "0")
 
-def get_opcode(jmp_kind, is_imm, read_from_ram, write_to_ram):
+def get_opcode(jmp_kind, is_imm, read_from_ram = False, write_to_ram = False, is_type_u = False, is_auipc = False):
     ht_jmp = {
         "none": 0,
         "branch": 1,
         "jalr" : 2,
         "jal" : 3
     }
-    return "00"+strb(write_to_ram)+strb(read_from_ram)+strb(is_imm)+get_number(ht_jmp[jmp_kind], 2, False)
+    return strb(is_auipc)+strb(is_type_u)+strb(write_to_ram)+strb(read_from_ram)+strb(is_imm)+get_number(ht_jmp[jmp_kind], 2, False)
 
 def op_imm(op, dest, src, imm):
     imm_final = get_imm(imm, 12)
@@ -114,7 +114,13 @@ def jump(dest, offset):
     return get_instruction("j", imm_J = get_imm(offset, 20), rd = get_reg(dest), opcode = get_opcode("jal", True, False, False))
 
 def jump_reg(dest, base, offset):
-    return get_instruction("i", imm_I = get_imm(offset, 12), rd = get_reg(dest), rs1 = get_reg(base), funct3 = get_op("add"), opcode = get_opcode("jalr", True, False, False))
+    return get_instruction("i", imm_I = get_imm(offset, 12), rd = get_reg(dest), rs1 = get_reg(base), funct3 = get_op("add"), opcode = get_opcode("jalr", True, False, False, False, False))
+
+def lui(dest, imm):
+    return get_instruction("u", imm_U = get_imm(imm, 20), rd = get_reg(dest), opcode = get_opcode("none", True, False, False, True, False))
+
+def auipc(dest, imm):
+    return get_instruction("u", imm_U = get_imm(imm, 20), rd = get_reg(dest), opcode = get_opcode("none", True, False, False, True, True))
 
 def print_prog(p):
     for n,i in enumerate(p):
@@ -190,7 +196,9 @@ prog_test_alu = [
     op_reg("slt", 0, 1, 2),
     op_reg("srl", 0, 1, 2),
     op_reg("sra", 0, 1, 2),
-    op_reg("sltu", 0, 1, 2)
+    op_reg("sltu", 0, 1, 2),
+    lui(0, 5),
+    auipc(0, 5)
  ]
 print_prog(prog_test_alu)
 print("\n"*15)

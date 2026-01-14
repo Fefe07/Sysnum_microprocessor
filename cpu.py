@@ -18,7 +18,7 @@ def extend_sign(x):
 
 def decoder(x):
     funct7 = x[25:32]
-    rs2 = x[20:25] # A CHANGER POUR U type
+    rs2 = x[20:25]
     rs1_bits = x[15:20]
     rd_bits = x[7:12]
     funct3 = x[12:15]
@@ -34,18 +34,21 @@ def decoder(x):
     is_imm = opcode[2]
     read_from_ram = opcode[3]
     write_to_ram = opcode[4]
-
+    is_type_u = opcode[5]
+    is_auipc = opcode[6]
+    rs1_u = clone(5, is_auipc) # refers to register pc or 0 
     is_branch = jmp_kind[0] & ~jmp_kind[1] #jmp_kind = 01 -> branch
     is_jmp = jmp_kind[1] # jmp_kind = 10 or 11  ->  jalr, jal
     
     
-    op = Mux(jmp_kind[0], funct3, Mux(is_branch, Constant("000") ,Constant("100")))
+    op = Mux(jmp_kind[0] | is_type_u , funct3, Mux(is_branch, Constant("000") ,Constant("100")))
     condition = Mux(is_branch, Constant("000"), funct3)
     rd = Mux( is_branch | write_to_ram, rd_bits, Constant(5*"0"))
     is_mult = (~is_imm) & funct7[0]
     op_option = funct7[5] | is_branch # | is_branch c'est pour forcer la soustraction lors d'un test de saut conditionnel, mais on en a pas besoin car seuls les flags nous intéresse, et les flags sont mis dès que op[0] = 1
-    rs1 = Mux(jmp_kind[0] & jmp_kind[1], rs1_bits, Constant(5*"1")) 
-    imm = Mux(jmp_kind[0], Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B))
+    rs1_not_u = Mux(jmp_kind[0] & jmp_kind[1], rs1_bits, Constant(5*"1")) 
+    rs1 = Mux(is_type_u, rs1_not_u, rs1_u)
+    imm = Mux( is_type_u,  Mux(jmp_kind[0], Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B)), imm_U)
     return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch, op_option
 
 def cpu():
