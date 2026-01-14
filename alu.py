@@ -15,23 +15,24 @@ from flags import flags
 # 1 -> sub
 # 2 -> and
 # 3 -> or
-# 4 -> not b
-# 5 -> xor
-# 6,7 -> 0 
+# 4 -> xor
+# 5 -> slt
+# 6 -> 0 
+# 7 -> sltu
 def alu(a, b, op):
     assert a.bus_size == b.bus_size
     assert op.bus_size == 3
     allow_ribbon_logic_operations(True)
     n = a.bus_size
 
-    n = a.bus_size
     add_sub, carry = arith_unit( a, b, op[0] ) 
-    and_or  = mux(op[0], (a & b) + (a|b) )
-    not_xor = mux(op[0], ( ~b )+ (a ^ b) )
-    zero_zero = Constant(n*"0")
-    res = mux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero)
-    
-    EQ, LTU, LT = flags(a, b, res, carry)
+    EQ, LTU, LT = flags(a, b, add_sub, carry)
+    and_or  = Mux(op[0], (a & b), (a|b) )
+    xor_slt = Mux(op[0], (a ^ b), LT + Constant((n-1)*"0") )
+    sltu = LTU + Constant((n-1)*"0")
+    zero_sltu = Mux(op[0], Constant(n*"0"), sltu )
+    # sltu.set_as_output("sltu")
+    res = mux(op[2] + op[1], add_sub+and_or+xor_slt+zero_sltu)
 
     return res, EQ, LTU, LT
 

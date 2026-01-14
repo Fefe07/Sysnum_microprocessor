@@ -43,8 +43,10 @@ def get_op(op):
         "sub" : 1,
         "and" : 2,
         "or"  : 3,
-        "not" : 4,
-        "xor" : 5,
+        "xor" : 4,
+        "slt" : 5,
+        "_" : 6,
+        "sltu" : 7,
 
         "mul" : 0,
         "mulhu": 1,
@@ -119,14 +121,15 @@ def print_prog(p):
 
 # Programme calculant la suite de fibonacci jusqu'à ce qu'elle dépasse 20
 prog_fibo = [
-    mov_imm(3, 20),
+    mov_imm(3, 1),
     mov_imm(1, 1),
     mov_imm(2, 1),
     mov_reg(4, 1),
     mov_reg(1, 2),
     mov_reg(2, 4),
     op_reg("add", 1, 1, 2),
-    branch("ltu", 1, 3, 3)]
+    op_imm("slt", 4, 1, 20),
+    branch("eq", 4, 3, -5)]
 
 prog_fibo2 = [
     mov_imm(3, 20),
@@ -170,5 +173,5 @@ prog_test = [
     ]+ (['0']*46) +[
     jump_reg(6, 5, 2) 
     ]
-print_prog(prog_test)
+print_prog(prog_fibo)
 print("\n"*50)
