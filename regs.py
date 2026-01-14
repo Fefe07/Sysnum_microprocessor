@@ -15,11 +15,11 @@ def register(data_in, write_en):
     assert write_en.bus_size == 1
     n = data_in.bus_size
     reg = Reg(Defer(n, lambda : reg_in))
-    reg_in = mux(write_en, reg+data_in)
+    reg_in = Mux(write_en, reg, data_in)
     return reg
 
-def registers(write_select, data_in, read_select_list, branch_en) :
-    assert branch_en.bus_size == 1
+def registers(write_select, data_in, read_select_list, is_branch, is_jmp ) :
+    assert is_jmp.bus_size == is_branch.bus_size == 1
     for read_sel_i in read_select_list:
         assert write_select.bus_size == read_sel_i.bus_size
     n = data_in.bus_size
@@ -32,10 +32,10 @@ def registers(write_select, data_in, read_select_list, branch_en) :
     assert len(write_en_signals) == nb_regs
     
     pc = Reg(Defer(n, lambda: actual_next_pc))
-    next_pc, overflow = adder(pc, Constant("1"+(n-1)*"0"), Constant("0"))
-    actual_next_pc = mux(write_en_signals[nb_regs-1] | branch_en, next_pc+data_in)
 
-    regs = [Constant(reg_size*"0")] + [register(mux(branch_en, data_in+next_pc), write_en_signals[i]) for i in range(1, nb_regs-1)] + [ pc ] 
+    next_pc, overflow = adder(pc, Mux(is_branch, Constant("1"+(n-1)*"0"), data_in), Constant("0"))
+    actual_next_pc = Mux(write_en_signals[nb_regs-1] | is_jmp , next_pc, data_in)
+    regs = [Constant(reg_size*"0")] + [register(Mux(is_jmp, data_in,next_pc), write_en_signals[i]) for i in range(1, nb_regs-1)] + [ pc ] 
      
     return tuple([mux(read_select, concat(regs)) for read_select in read_select_list] + [pc])
 

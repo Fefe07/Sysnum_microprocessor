@@ -18,8 +18,8 @@ def extend_sign(x):
 
 def decoder(x):
     funct7 = x[25:32]
-    rs2 = x[20:25] # A CHANGER POUR U et J type
-    rs1 = x[15:20]
+    rs2 = x[20:25] # A CHANGER POUR U type
+    rs1_bits = x[15:20]
     rd_bits = x[7:12]
     funct3 = x[12:15]
     opcode = x[0:7]
@@ -30,23 +30,26 @@ def decoder(x):
     imm_U = Constant(12*"0") + x[12:32]
     imm_J = extend_sign(x[12:32])
 
-    is_jmp = opcode[0]
-    is_branch = opcode[1]
+    jmp_kind = opcode[0:2] # jal, jalr 
     is_imm = opcode[2]
     read_from_ram = opcode[3]
     write_to_ram = opcode[4]
-    
-    op = Mux(is_branch, funct3, Constant("100"))
-    condition = Mux(is_branch, Mux(is_jmp, Constant("000"),Constant("001")), funct3)
-    rd = Mux(is_branch | write_to_ram, rd_bits, Constant("00000"))
-    is_mult = (~is_imm) & funct7[0]
 
-    imm = Mux(is_jmp | is_branch, Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B))
-    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult
+    is_branch = jmp_kind[0] & ~jmp_kind[1] #jmp_kind = 01 -> branch
+    is_jmp = jmp_kind[1] # jmp_kind = 10 or 11  ->  jalr, jal
+    
+    
+    op = Mux(jmp_kind[0], funct3, Mux(is_branch, Constant("000") ,Constant("100")))
+    condition = Mux(is_branch, Constant("000"), funct3)
+    rd = Mux( is_branch | write_to_ram, rd_bits, Constant(5*"0"))
+    is_mult = (~is_imm) & funct7[0]
+    rs1 = Mux(jmp_kind[0] & jmp_kind[1], rs1_bits, Constant(5*"1")) 
+    imm = Mux(jmp_kind[0], Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B))
+    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch
 
 def cpu():
     allow_ribbon_logic_operations(True)
-    DISABLE_MULTIPLICATION = False # ça peut ralentir significativement la compilation 
+    DISABLE_MULTIPLICATION = True # ça peut ralentir significativement la compilation 
     n = 32
     data_size = n
     instruction_size = 32
@@ -54,11 +57,10 @@ def cpu():
     ram_addr_size = 10
     # reg_addr_size = 5
 
-    vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], Defer(1, lambda: condition_met ))
+    vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], Defer(1, lambda: condition_met ), Defer(1, lambda: is_jmp))
     instruction = ROM(rom_addr_size, instruction_size, pc[:rom_addr_size])
-    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult = decoder(instruction)
+    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch = decoder(instruction)
     
-    is_conditional_branch = b_or(condition[1:])
     va = vs1
     vb = mux(is_imm, vs2 + imm) 
 
@@ -69,7 +71,7 @@ def cpu():
     condition_met = condition[0] ^ (mux(condition[1:], Constant("0")+eq+lt+ltu))
     # reads from /writes vs2 to the adress result (modulo the size of the ram)  - it writes if write_to_ram = 1
     data_from_ram = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs2)
-    data_in_regs = mux(read_from_ram, mux(is_conditional_branch, result+imm) + data_from_ram)
+    data_in_regs = Mux(read_from_ram, Mux(is_branch, result, imm), data_from_ram)
     
     return rd, va, vb, pc, condition_met, data_in_regs 
 
