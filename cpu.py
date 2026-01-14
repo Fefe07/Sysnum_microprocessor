@@ -43,9 +43,10 @@ def decoder(x):
     condition = Mux(is_branch, Constant("000"), funct3)
     rd = Mux( is_branch | write_to_ram, rd_bits, Constant(5*"0"))
     is_mult = (~is_imm) & funct7[0]
+    op_option = funct7[5] | is_branch # | is_branch c'est pour forcer la soustraction lors d'un test de saut conditionnel, mais on en a pas besoin car seuls les flags nous intéresse, et les flags sont mis dès que op[0] = 1
     rs1 = Mux(jmp_kind[0] & jmp_kind[1], rs1_bits, Constant(5*"1")) 
     imm = Mux(jmp_kind[0], Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B))
-    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch
+    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch, op_option
 
 def cpu():
     allow_ribbon_logic_operations(True)
@@ -59,12 +60,12 @@ def cpu():
 
     vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], Defer(1, lambda: condition_met ), Defer(1, lambda: is_jmp))
     instruction = ROM(rom_addr_size, instruction_size, pc[:rom_addr_size])
-    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch = decoder(instruction)
+    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch, op_option = decoder(instruction)
     
     va = vs1
     vb = mux(is_imm, vs2 + imm) 
 
-    alu_result, eq, ltu, lt = alu(va, vb, op)
+    alu_result, eq, ltu, lt = alu(va, vb, op, op_option)
     mult_res = mux(op[0],  multiplier(va, vb, op[1], op[2]) if not DISABLE_MULTIPLICATION else Constant(64*"0") )
     result = Mux(is_mult, alu_result, mult_res)
     # conditions : NEVER = 000  ALWAYS = 001  LT = 010  GE = 011  EQ = 100  NEQ = 101  LTU = 110  GEU = 111       

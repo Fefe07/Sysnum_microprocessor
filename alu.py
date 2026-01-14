@@ -7,32 +7,36 @@ from typing import *
 
 from arith_unit import arith_unit, adder 
 from mux import mux
-from log_unit import b_or
+from log_unit import left_shift, right_shift
 from flags import flags
 
 # opérations actuelles ( va sûrement changer ! )
 # 0 -> add
-# 1 -> sub
+# 1 -> sll_sub (op_opt = 0 -> sll | op_opt = 1 -> sub )
 # 2 -> and
 # 3 -> or
 # 4 -> xor
 # 5 -> slt
-# 6 -> 0 
+# 6 -> srl_sra (op_opt = 0 -> srl | op_opt = 1 -> sra )
 # 7 -> sltu
-def alu(a, b, op):
+
+def alu(a, b, op, op_opt):
+    assert op_opt.bus_size == 1
     assert a.bus_size == b.bus_size
     assert op.bus_size == 3
     allow_ribbon_logic_operations(True)
     n = a.bus_size
-
-    add_sub, carry = arith_unit( a, b, op[0] ) 
+    sll = left_shift(a, b[:5])
+    srl_sra = right_shift(a, b[:5], op_opt)
+    add_sub, carry = arith_unit( a, b, op[0] )
+    add__sll_sub = Mux( op[0] , add_sub , Mux(op_opt, sll, add_sub))
     EQ, LTU, LT = flags(a, b, add_sub, carry)
     and_or  = Mux(op[0], (a & b), (a|b) )
     xor_slt = Mux(op[0], (a ^ b), LT + Constant((n-1)*"0") )
     sltu = LTU + Constant((n-1)*"0")
-    zero_sltu = Mux(op[0], Constant(n*"0"), sltu )
+    sra_srl__sltu = Mux(op[0], srl_sra , sltu )
     # sltu.set_as_output("sltu")
-    res = mux(op[2] + op[1], add_sub+and_or+xor_slt+zero_sltu)
+    res = mux(op[2] + op[1], add__sll_sub+and_or+xor_slt+sra_srl__sltu)
 
     return res, EQ, LTU, LT
 

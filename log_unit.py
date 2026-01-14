@@ -34,7 +34,7 @@ def left_shift(a, b):
     m = b.bus_size
     n = a.bus_size
     zeros = Constant((2**(m-1))*"0")
-    a2 = Mux(b[m-1],a+zeros, zeros+a)
+    a2 = Mux(b[m-1],a+zeros, zeros+a)[:n]
     if m == 1 :
         return a2
     return left_shift(a2, b[:m-1])
@@ -43,8 +43,8 @@ def right_shift(a, b, sign_extend):
     m = b.bus_size
     n = a.bus_size
     curr_shift = 2**(m-1)
-
-    extended_a = a+( Constant(curr_shift*"0") if not sign_extend else clone(curr_shift,a[n-1]))
+    
+    extended_a = a+( clone(curr_shift,a[n-1] & sign_extend))
     a2 = Mux(b[m-1],extended_a[:n], extended_a[curr_shift:curr_shift+n])
     if m == 1 :
         return a2
@@ -56,8 +56,8 @@ def main() -> None :
     b = Input(n)
 
     left_shift(a,b).set_as_output("r_lshift")
-    right_shift(a,b, False).set_as_output("r_rlshift")
-    right_shift(a,b, True).set_as_output("r_rashift")
+    right_shift(a,b, Constant("0")).set_as_output("r_rlshift")
+    right_shift(a,b, Constant("1")).set_as_output("r_rashift")
     b_and(a).set_as_output("big_and_a")
     b_or(b).set_as_output("big_or_b")
 

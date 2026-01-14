@@ -40,12 +40,12 @@ def get_number(x, size, signed):
 def get_op(op):
     ht = {
         "add" : 0,
-        "sub" : 1,
+        "sll" : 1, "sub" : 1,
         "and" : 2,
         "or"  : 3,
         "xor" : 4,
         "slt" : 5,
-        "_" : 6,
+        "srl" : 6, "sra" : 6, 
         "sltu" : 7,
 
         "mul" : 0,
@@ -87,10 +87,13 @@ def get_opcode(jmp_kind, is_imm, read_from_ram, write_to_ram):
     return "00"+strb(write_to_ram)+strb(read_from_ram)+strb(is_imm)+get_number(ht_jmp[jmp_kind], 2, False)
 
 def op_imm(op, dest, src, imm):
-    return get_instruction("i", imm_I = get_imm(imm, 12), rs1 = get_reg(src), rd = get_reg(dest), opcode = "0000100", funct3 = get_op(op))
+    imm_final = get_imm(imm, 12)
+    if op in ["sll", "srl", "sra"] :
+        imm_final = "0"+ strb(op == "sra") +"00000"+get_number(imm, 5, False)
+    return get_instruction("i", imm_I = imm_final, rs1 = get_reg(src), rd = get_reg(dest), opcode = "0000100", funct3 = get_op(op))
 
 def op_reg(op, dest, src1, src2):
-    return get_instruction("r", rs2 = get_reg(src2), rs1 = get_reg(src1), rd = get_reg(dest), opcode = "0000000", funct7 = ("0000001" if op[:3] == "mul" else "0000000"), funct3 = get_op(op))
+    return get_instruction("r", rs2 = get_reg(src2), rs1 = get_reg(src1), rd = get_reg(dest), opcode = "0000000", funct7 = ("0000001" if op[:3] == "mul" else ( "0100000" if op == "sub" or op == "sra" else "0000000" ) ), funct3 = get_op(op))
 
 def branch(condition, src1, src2, addr):
     return get_instruction("b", rs2 = get_reg(src2), rs1 = get_reg(src1), opcode = get_opcode("branch", False, False, False), funct3 = get_condition(condition), imm_B = get_imm(addr, 12))
@@ -141,7 +144,7 @@ prog_fibo2 = [
     op_reg("add", 1, 1, 2),
     store(3, -1, 1),
     load(1, 0, 19), 
-    branch("ltu", 1, 3, 3)]
+    branch("ltu", 1, 3, -6)]
 
 prog_fact = [
     mov_imm(1, -20),
@@ -152,10 +155,10 @@ prog_fact = [
     op_reg("mul", 3, 3, 1),
     op_reg("add", 3, 3, 4),
     op_imm("add", 1, 1, 1),
-    branch("neq", 1, 0, 3)
+    branch("neq", 1, 0, -5)
 ]
 
-prog_test = [
+prog_test_jmp = [
     mov_imm(3, 20),
     mov_imm(1, 1),
     mov_imm(2, 1),
@@ -173,5 +176,21 @@ prog_test = [
     ]+ (['0']*46) +[
     jump_reg(6, 5, 2) 
     ]
-print_prog(prog_fibo)
-print("\n"*50)
+
+prog_test_alu = [
+    mov_imm(1, -20),
+    mov_imm(2, 23),
+    op_imm("sll", 0, 1, 23),
+    op_reg("add", 0, 1, 2),
+    op_reg("sll", 0, 1, 2),
+    op_reg("sub", 0, 1, 2),
+    op_reg("and", 0, 1, 2),
+    op_reg("or", 0, 1, 2),
+    op_reg("xor", 0, 1, 2),
+    op_reg("slt", 0, 1, 2),
+    op_reg("srl", 0, 1, 2),
+    op_reg("sra", 0, 1, 2),
+    op_reg("sltu", 0, 1, 2)
+ ]
+print_prog(prog_test_alu)
+print("\n"*15)
