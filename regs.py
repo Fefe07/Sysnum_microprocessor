@@ -33,7 +33,7 @@ def registers(write_select, data_in, read_select_list, is_branch, is_jmp ) :
     
     pc = Reg(Defer(n, lambda: actual_next_pc))
 
-    next_pc, overflow = adder(pc, Mux(is_branch, Constant("1"+(n-1)*"0"), data_in), Constant("0"))
+    next_pc, _ = adder(pc, Mux(is_branch, Constant("001"+(n-3)*"0"), data_in), Constant("0"))
     actual_next_pc = Mux(write_en_signals[nb_regs-1] | is_jmp , next_pc, data_in)
     regs = [Constant(reg_size*"0")] + [register(Mux(is_jmp, data_in,next_pc), write_en_signals[i]) for i in range(1, nb_regs-1)] + [ pc ] 
      

@@ -138,7 +138,7 @@ prog_fibo = [
     mov_reg(2, 4),
     op_reg("add", 1, 1, 2),
     op_imm("slt", 4, 1, 20),
-    branch("eq", 4, 3, -5)]
+    branch("eq", 4, 3, -5*4)]
 
 prog_fibo2 = [
     mov_imm(3, 20),
@@ -148,9 +148,9 @@ prog_fibo2 = [
     mov_reg(1, 2),
     mov_reg(2, 4),
     op_reg("add", 1, 1, 2),
-    store(3, -1, 1),
-    load(1, 0, 19), 
-    branch("ltu", 1, 3, -6)]
+    store(3, -4, 1),
+    load(1, 0, 16), 
+    branch("ltu", 1, 3, -6*4)]
 
 prog_fact = [
     mov_imm(1, -20),
@@ -161,7 +161,7 @@ prog_fact = [
     op_reg("mul", 3, 3, 1),
     op_reg("add", 3, 3, 4),
     op_imm("add", 1, 1, 1),
-    branch("neq", 1, 0, -5)
+    branch("neq", 1, 0, -5*4)
 ]
 
 prog_test_jmp = [
@@ -172,15 +172,15 @@ prog_test_jmp = [
     mov_reg(1, 2),
     mov_reg(2, 4),
     op_reg("add", 1, 1, 2),
-    store(3, -1, 1),
-    load(1, 0, 19), 
-    branch("ltu", 1, 3, -6),
-    jump(5, 50),
+    store(3, -4, 1),
+    load(1, 0, 16), 
+    branch("ltu", 1, 3, -6*4),
+    jump(5, 50*4),
     '0',
     '0',
     mov_reg(6, 6)
     ]+ (['0']*46) +[
-    jump_reg(6, 5, 2) 
+    jump_reg(6, 5, 2*4) 
     ]
 
 prog_test_alu = [
@@ -200,5 +200,5 @@ prog_test_alu = [
     lui(0, 5),
     auipc(0, 5)
  ]
-print_prog(prog_test_alu)
-print("\n"*15)
+print_prog(prog_test_jmp)
+print("\n"*60)

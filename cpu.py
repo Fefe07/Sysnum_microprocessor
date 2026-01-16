@@ -62,7 +62,7 @@ def cpu():
     # reg_addr_size = 5
 
     vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], Defer(1, lambda: condition_met ), Defer(1, lambda: is_jmp))
-    instruction = ROM(rom_addr_size, instruction_size, pc[:rom_addr_size])
+    instruction = ROM(rom_addr_size, instruction_size, pc[2:rom_addr_size+2])
     rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch, op_option = decoder(instruction)
     
     va = vs1
@@ -74,7 +74,7 @@ def cpu():
     # conditions : NEVER = 000  ALWAYS = 001  LT = 010  GE = 011  EQ = 100  NEQ = 101  LTU = 110  GEU = 111       
     condition_met = condition[0] ^ (mux(condition[1:], Constant("0")+eq+lt+ltu))
     # reads from /writes vs2 to the adress result (modulo the size of the ram)  - it writes if write_to_ram = 1
-    data_from_ram = RAM(ram_addr_size, data_size, result[:ram_addr_size], write_to_ram, result[:ram_addr_size], vs2)
+    data_from_ram = RAM(ram_addr_size, data_size, result[2:ram_addr_size+2], write_to_ram, result[2:ram_addr_size+2], vs2)   
     data_in_regs = Mux(read_from_ram, Mux(is_branch, result, imm), data_from_ram)
     
     return rd, va, vb, pc, condition_met, data_in_regs 
