@@ -44,11 +44,12 @@ def main() -> None:
     '''Entry point of this example'''
     allow_ribbon_logic_operations(True)
 
-    n = 4
+    n = 8
     a, ov = adder(Reg(Defer(n, lambda: a)), Constant(n*"0"), Constant("1"))
     b, _ = adder(Reg(Defer(n, lambda: b)), Constant(n*"0"), ov)
     op = Constant("100")
-    res, eq, ltu, lt = alu(a, b, op)
+    op_opt = Constant("0")
+    res, eq, ltu, lt = alu(a, b, op, op_opt)
     a.set_as_output("a")
     b.set_as_output("b")
     res.set_as_output("res")
