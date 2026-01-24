@@ -15,7 +15,8 @@ def clone(n, x):
     return concat(n*[x])
 
 def multi_binop(f_op, a):
-    assert a.bus_size >= 2
+    if a.bus_size == 1 :
+        return a
     if a.bus_size == 2 :
         return f_op(a[0], a[1])
     return f_op(a[0], multi_binop(f_op, a[1:]) )
