@@ -48,7 +48,8 @@ def main():
     read_select1 = Input(3)
     read_select2 = Input(3)
     branch_en = Input(1)
-    regs = registers(write_select, data_in, [read_select1, read_select2], branch_en)
+    is_jump = Input(1)
+    regs = registers(write_select, data_in, [read_select1, read_select2], branch_en, is_jump)
     for i in range(len(regs)-1) :
         regs[i].set_as_output("r"+str(i+1))
     regs[-1].set_as_output("pc")
