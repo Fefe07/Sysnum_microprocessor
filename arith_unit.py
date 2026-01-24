@@ -34,8 +34,8 @@ def arith_unit(a, b, is_sub) :
     n = a.bus_size
     n_is_sub = concat(n*[is_sub])
     conditioned_not_b = b ^ n_is_sub
-    (s, overflow) = adder(a, conditioned_not_b, is_sub)
-    return (s, overflow)
+    s, carry = adder(a, conditioned_not_b, is_sub)
+    return s, carry
 
 def main() -> None:
     '''Entry point of this example'''
@@ -45,9 +45,9 @@ def main() -> None:
     a = Input(n)
     b = Input(n)
     c = Input(1)
-    (result, overflow) = arith_unit(a, b, c)
+    (result, carry) = arith_unit(a, b, c)
     result.set_as_output("r")
-    overflow.set_as_output("overflow")
+    carry.set_as_output("carry")
 
 # Example:
 # Step 1 :
@@ -55,10 +55,10 @@ def main() -> None:
 # b ? 3
 # c ? 1
 # => r = 12 (0b1100)
-# => overflow = 1 (0b1)
+# => carry = 1 (0b1)
 # Step 2 :
 # a ? 9 
 # b ? 2
 # c ? 0
 # => r = 11 (0b1011)
-# => overflow = 0 (0b0)
+# => carry = 0 (0b0)

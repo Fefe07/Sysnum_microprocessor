@@ -1,6 +1,4 @@
-CAROTTE_PATH = ../carotte.py/carotte.py # Mettez le chemin relatif vers votre carotte.py 
-PYTHON_INTERPRETER = python3 # Si ça marche pas chais vous, essayez avec "python" ou "py"
-SIMULATOR = ./../Netlist_simulator/netlist_simulator.byte # Mettez le chemin vers votre simulateur netlist
+include config.mk
 
 % : %.py
 	mkdir -p build
@@ -12,6 +10,9 @@ sim :
 
 all :
 	make alu log_unit arith_unit demux mux program_counter regs
+
+update :
+	make -C $(SIMULATOR_DIR) build
 
 clean :
 	rm -rf ./build/

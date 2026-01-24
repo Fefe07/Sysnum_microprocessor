@@ -5,7 +5,7 @@
 from lib_carotte import *
 from typing import *
 
-from arith_unit import adder
+from arith_unit import adder, arith_unit
 from log_unit import clone
 
 def multipliy(a, b):
@@ -25,8 +25,37 @@ def multipliy(a, b):
     assert s.bus_size == a.bus_size+b.bus_size
     return s
 
+def multiplier(a,b,a_signed, b_signed):
+    assert a.bus_size == b.bus_size and a.bus_size > 2
+    assert b_signed.bus_size == a_signed.bus_size == 1
+    n = a.bus_size
+
+    xa = Mux(a_signed, b, a)
+    xb = Mux(a_signed, a, b)
+    only_a_signed = a_signed ^ b_signed 
+    both_signed = a_signed & b_signed 
+
+    sa = xa[n-1]
+    sb = xb[n-1]
+    la = xa[:n-1]
+    lb = xb[:n-1]
+    
+    low = multipliy(la, lb)
+    s_mid, carry = arith_unit(clone(n-1,sb) & la, clone(n-1,sa) & lb , only_a_signed )
+    overflow = carry ^ only_a_signed
+    middle = s_mid+overflow
+    s = sa & sb
+    exterior_part = low + s + (s & only_a_signed)
+    middle_part = Constant((n-1)*"0") + middle + (overflow & only_a_signed)
+    
+    res, _ =  arith_unit(exterior_part, middle_part, both_signed)
+    assert res.bus_size == 2*n
+    return res
+
 def main():
-    a = Input(8)
-    b = Input(8)
-    x = multipliy(a,b)
+    a = Input(4)
+    b = Input(4)
+    a_signed = Constant("0")
+    b_signed = Constant("0")
+    x = multiplier(a,b,a_signed, b_signed)
     x.set_as_output("r")

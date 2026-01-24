@@ -5,38 +5,57 @@
 from lib_carotte import *
 from typing import *
 
-from arith_unit import arith_unit
+from arith_unit import arith_unit, adder 
 from mux import mux
+from log_unit import left_shift, right_shift
+from flags import flags
 
 # opérations actuelles ( va sûrement changer ! )
 # 0 -> add
-# 1 -> sub
+# 1 -> sll_sub (op_opt = 0 -> sll | op_opt = 1 -> sub )
 # 2 -> and
 # 3 -> or
-# 4 -> not b
-# 5 -> xor
-# 6,7 -> 0 
+# 4 -> xor
+# 5 -> slt
+# 6 -> srl_sra (op_opt = 0 -> srl | op_opt = 1 -> sra )
+# 7 -> sltu
 
-def alu(a, b, op):
+def alu(a, b, op, op_opt):
+    assert op_opt.bus_size == 1
     assert a.bus_size == b.bus_size
     assert op.bus_size == 3
     allow_ribbon_logic_operations(True)
-
     n = a.bus_size
-    add_sub, overflow = arith_unit( a, b, op[0] ) 
-    and_or  = mux(op[0], (a & b) + (a|b) )
-    not_xor = mux(op[0], ( ~b )+ (a ^ b) )
-    zero_zero = Constant(n*"0")
-    return mux(op[2] + op[1], add_sub+and_or+not_xor+zero_zero) , overflow & ~op[1] & ~op[2] 
+    sll = left_shift(a, b[:5])
+    srl_sra = right_shift(a, b[:5], op_opt)
+    add_sub, carry = arith_unit( a, b, op[0] )
+    add__sll_sub = Mux( op[0] , add_sub , Mux(op_opt, sll, add_sub))
+    EQ, LTU, LT = flags(a, b, add_sub, carry)
+    and_or  = Mux(op[0], (a & b), (a|b) )
+    xor_slt = Mux(op[0], (a ^ b), LT + Constant((n-1)*"0") )
+    sltu = LTU + Constant((n-1)*"0")
+    sra_srl__sltu = Mux(op[0], srl_sra , sltu )
+    # sltu.set_as_output("sltu")
+    res = mux(op[2] + op[1], add__sll_sub+and_or+xor_slt+sra_srl__sltu)
+
+    return res, EQ, LTU, LT
 
 def main() -> None:
     '''Entry point of this example'''
+    allow_ribbon_logic_operations(True)
 
-    n = 8
-    a = Input(n)
-    b = Input(n)
-    op = Input(3)
-    alu(a, b, op)[0].set_as_output("r")
+    n = 4
+    a, ov = adder(Reg(Defer(n, lambda: a)), Constant(n*"0"), Constant("1"))
+    b, _ = adder(Reg(Defer(n, lambda: b)), Constant(n*"0"), ov)
+    op = Constant("100")
+    res, eq, ltu, lt = alu(a, b, op)
+    a.set_as_output("a")
+    b.set_as_output("b")
+    res.set_as_output("res")
+    eq.set_as_output("eq")
+    lt.set_as_output("lt")
+    ltu.set_as_output("ltu")
+    
 
 # Exemples:
 
