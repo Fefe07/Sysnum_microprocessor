@@ -53,8 +53,9 @@ def multiplier(a,b,a_signed, b_signed):
     return res
 
 def main():
-    a = Input(4)
-    b = Input(4)
+    n = 8
+    a = Input(n)
+    b = Input(n)
     a_signed = Constant("0")
     b_signed = Constant("0")
     x = multiplier(a,b,a_signed, b_signed)

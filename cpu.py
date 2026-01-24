@@ -11,6 +11,7 @@ from mux import mux
 from alu import alu
 from log_unit import b_or, clone
 from multiplier import multiplier
+from divider import divider
 
 def extend_sign(x):
     n = x.bus_size
@@ -44,16 +45,17 @@ def decoder(x):
     op = Mux(jmp_kind[0] | is_type_u , funct3, Mux(is_branch, Constant("000") ,Constant("100")))
     condition = Mux(is_branch, Constant("000"), funct3)
     rd = Mux( is_branch | write_to_ram, rd_bits, Constant(5*"0"))
-    is_mult = (~is_imm) & funct7[0]
+    is_muldiv = (~is_imm) & funct7[0]
     op_option = funct7[5] | is_branch # | is_branch c'est pour forcer la soustraction lors d'un test de saut conditionnel, mais on en a pas besoin car seuls les flags nous intéresse, et les flags sont mis dès que op[0] = 1
     rs1_not_u = Mux(jmp_kind[0] & jmp_kind[1], rs1_bits, Constant(5*"1")) 
     rs1 = Mux(is_type_u, rs1_not_u, rs1_u)
     imm = Mux( is_type_u,  Mux(jmp_kind[0], Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B)), imm_U)
-    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch, op_option
+    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_muldiv, is_jmp, is_branch, op_option
 
 def cpu():
     allow_ribbon_logic_operations(True)
     DISABLE_MULTIPLICATION = True # ça peut ralentir significativement la compilation 
+    DISABLE_DIVISION = True
     n = 32
     data_size = n
     instruction_size = 32
@@ -63,14 +65,17 @@ def cpu():
 
     vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], Defer(1, lambda: condition_met ), Defer(1, lambda: is_jmp))
     instruction = ROM(rom_addr_size, instruction_size, pc[2:rom_addr_size+2])
-    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_mult, is_jmp, is_branch, op_option = decoder(instruction)
+    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_muldiv, is_jmp, is_branch, op_option = decoder(instruction)
     
     va = vs1
     vb = mux(is_imm, vs2 + imm) 
 
     alu_result, eq, ltu, lt = alu(va, vb, op, op_option)
-    mult_res = mux(op[0],  multiplier(va, vb, op[1], op[2]) if not DISABLE_MULTIPLICATION else Constant(64*"0") )
-    result = Mux(is_mult, alu_result, mult_res)
+    mult_res = mux(op[0] | op[1],  multiplier(va, vb, op[0], op[1] & op[0]) if not DISABLE_MULTIPLICATION else Constant(64*"0") )
+    div,rem = (divider(va, vb, op[0]) if not DISABLE_DIVISION else (Constant(32*"0"), Constant(32*"0")))
+    div_res = Mux(op[1], rem, div)
+    muldiv_res = Mux(op[2], mult_res, div_res)
+    result = Mux(is_muldiv, alu_result, muldiv_res)
     # conditions : NEVER = 000  ALWAYS = 001  LT = 010  GE = 011  EQ = 100  NEQ = 101  LTU = 110  GEU = 111       
     condition_met = condition[0] ^ (mux(condition[1:], Constant("0")+eq+lt+ltu))
     # reads from /writes vs2 to the adress result (modulo the size of the ram)  - it writes if write_to_ram = 1
