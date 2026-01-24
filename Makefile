@@ -9,7 +9,7 @@ sim :
 	$(SIMULATOR) ./build/current.net
 
 all :
-	make alu log_unit arith_unit demux mux program_counter regs forwarding hazards
+	make alu log_unit arith_unit demux mux regs forwarding hazards
 
 update :
 	make -C $(SIMULATOR_DIR) build
