@@ -122,11 +122,34 @@ def lui(dest, imm):
 def auipc(dest, imm):
     return get_instruction("u", imm_U = get_imm(imm, 20), rd = get_reg(dest), opcode = get_opcode("none", True, False, False, True, True))
 
+RSP = 2
+RAR = 1
+PC = 2**5 - 1 
+def push(reg):
+    [op_imm("add", RSP, RSP, 4),
+    store(RSP, 0, reg)]
+
+def pop(reg):
+    [load(reg, RSP, 0),
+    op_imm("add", RSP, -4)]
+
+def call(offset):
+    push(RAR) + [jump(RAR, offset)] + pop(RAR)
+
+def ret():
+    jump_reg(0, RAR, 0)
+
+
 def print_prog(p):
+    print()
+    need_pos = False
     for n,i in enumerate(p):
         if i != '0':
-            print(n)
+            if need_pos :
+                print("."+str(4*n))
             print("0b"+i)
+        else :
+            need_pos = True
 
 # Programme calculant la suite de fibonacci jusqu'à ce qu'elle dépasse 20
 prog_fibo = [
@@ -201,4 +224,4 @@ prog_test_alu = [
     auipc(0, 5)
  ]
 print_prog(prog_test_jmp)
-print("\n"*60)
+# print("\n"*60)
