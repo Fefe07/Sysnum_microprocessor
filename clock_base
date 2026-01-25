@@ -1,0 +1,2 @@
+#!/bin/sh
+python3 clock_base_instructions.py | ../Netlist_simulator/netlist_simulator.byte --print 0 -q build/cpu.net

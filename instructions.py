@@ -173,8 +173,7 @@ def ret():
 
 
 def print_prog(p):
-    print(0)
-    print("\n")
+    print()
     need_pos = False
     for n,i in enumerate(p):
         if i != '0':
@@ -270,3 +269,6 @@ prog_test_muldiv = [
     op_reg("rem", 0, 1, 2),
     op_reg("remu", 0, 1, 2)
 ]
+
+if __name__ == "__main__":
+    print_prog(progfibo)
