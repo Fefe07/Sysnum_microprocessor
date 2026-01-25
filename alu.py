@@ -29,14 +29,14 @@ def alu(a, b, op, op_opt):
     sll = left_shift(a, b[:5])
     srl_sra = right_shift(a, b[:5], op_opt)
     add_sub, carry = arith_unit( a, b, op[0] )
-    add__sll_sub = Mux( op[0] , add_sub , Mux(op_opt, sll, add_sub))
+    add_sll_sub = Mux( op[0] , add_sub , Mux(op_opt, sll, add_sub))
     EQ, LTU, LT = flags(a, b, add_sub, carry)
     and_or  = Mux(op[0], (a & b), (a|b) )
     xor_slt = Mux(op[0], (a ^ b), LT + Constant((n-1)*"0") )
     sltu = LTU + Constant((n-1)*"0")
-    sra_srl__sltu = Mux(op[0], srl_sra , sltu )
+    sra_srl_sltu = Mux(op[0], srl_sra , sltu )
     # sltu.set_as_output("sltu")
-    res = mux(op[2] + op[1], add__sll_sub+and_or+xor_slt+sra_srl__sltu)
+    res = mux(op[2] + op[1], add_sll_sub+and_or+xor_slt+sra_srl_sltu)
 
     return res, EQ, LTU, LT
 

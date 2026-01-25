@@ -53,10 +53,14 @@ def get_op(op):
         "srl" : 6, "sra" : 6, 
         "sltu" : 7,
 
-        "mul" : 0,
-        "mulhu": 1,
-        "mulhsu" : 3,
-        "mulh" : 7
+        "mul" : 0b000,
+        "mulhsu" : 0b001,
+        "mulhu": 0b010,
+        "mulh" : 0b011,
+        "div" : 0b111,
+        "divu" : 0b110,
+        "rem" : 0b101,
+        "remu": 0b100
     }
     return get_number(ht[op], 3, False)
 
@@ -98,7 +102,7 @@ def op_imm(op, dest, src, imm):
     return get_instruction("i", imm_I = imm_final, rs1 = get_reg(src), rd = get_reg(dest), opcode = "0000100", funct3 = get_op(op))
 
 def op_reg(op, dest, src1, src2):
-    return get_instruction("r", rs2 = get_reg(src2), rs1 = get_reg(src1), rd = get_reg(dest), opcode = "0000000", funct7 = ("0000001" if op[:3] == "mul" else ( "0100000" if op == "sub" or op == "sra" else "0000000" ) ), funct3 = get_op(op))
+    return get_instruction("r", rs2 = get_reg(src2), rs1 = get_reg(src1), rd = get_reg(dest), opcode = "0000000", funct7 = ("0000001" if op[:3] in ["mul", "div", "rem"] else ( "0100000" if op == "sub" or op == "sra" else "0000000" ) ), funct3 = get_op(op))
 
 def branch(condition, src1, src2, addr):
     return get_instruction("b", 
@@ -169,7 +173,8 @@ def ret():
 
 
 def print_prog(p):
-    print()
+    print(0)
+    print("\n")
     need_pos = False
     for n,i in enumerate(p):
         if i != '0':
@@ -189,7 +194,8 @@ prog_fibo = [
     mov_reg(2, 4),
     op_reg("add", 1, 1, 2),
     op_imm("slt", 4, 1, 20),
-    branch("eq", 4, 3, -5*4)]
+    store(0,0,1),
+    branch("eq", 4, 3, -6*4)]
 
 prog_fibo2 = [
     mov_imm(3, 20),
@@ -251,9 +257,16 @@ prog_test_alu = [
     lui(0, 5),
     auipc(0, 5)
  ]
-prog_test_jmp2 =[
 
+prog_test_muldiv = [
+    mov_imm(1, -105),
+    mov_imm(2, -10),
+    op_reg("mul", 0, 1, 2),
+    op_reg("mulh", 0, 1, 2),
+    op_reg("mulhu", 0, 1, 2),
+    op_reg("mulhsu", 0, 1, 2),
+    op_reg("div", 0, 1, 2),
+    op_reg("divu", 0, 1, 2),
+    op_reg("rem", 0, 1, 2),
+    op_reg("remu", 0, 1, 2)
 ]
-
-#print_prog(prog_test_jmp)
-# print("\n"*60)
