@@ -242,5 +242,3 @@ prog_test_muldiv = [
     op_reg("rem", 0, 1, 2),
     op_reg("remu", 0, 1, 2)
 ]
-print_prog(prog_fibo)
-print()
