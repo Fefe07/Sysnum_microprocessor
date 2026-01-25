@@ -145,6 +145,7 @@ def ret():
 
 
 def print_prog(p):
+    print(0)
     print("\n")
     need_pos = False
     for n,i in enumerate(p):
@@ -165,7 +166,8 @@ prog_fibo = [
     mov_reg(2, 4),
     op_reg("add", 1, 1, 2),
     op_imm("slt", 4, 1, 20),
-    branch("eq", 4, 3, -5*4)]
+    store(0,0,1),
+    branch("eq", 4, 3, -6*4)]
 
 prog_fibo2 = [
     mov_imm(3, 20),
@@ -240,5 +242,5 @@ prog_test_muldiv = [
     op_reg("rem", 0, 1, 2),
     op_reg("remu", 0, 1, 2)
 ]
-print_prog(prog_test_muldiv)
-print("\n"*15)
+print_prog(prog_fibo)
+print()
