@@ -1,3 +1,8 @@
+#################################
+#  Permet d'écrire des programmes en "pseudo-assembleur" 
+
+
+
 def get_instruction(t, **args):
     if t == "r" :
         res = args["funct7"]+args["rs2"]+args["rs1"]+args["funct3"]+args["rd"]+args["opcode"]
@@ -96,7 +101,12 @@ def op_reg(op, dest, src1, src2):
     return get_instruction("r", rs2 = get_reg(src2), rs1 = get_reg(src1), rd = get_reg(dest), opcode = "0000000", funct7 = ("0000001" if op[:3] == "mul" else ( "0100000" if op == "sub" or op == "sra" else "0000000" ) ), funct3 = get_op(op))
 
 def branch(condition, src1, src2, addr):
-    return get_instruction("b", rs2 = get_reg(src2), rs1 = get_reg(src1), opcode = get_opcode("branch", False, False, False), funct3 = get_condition(condition), imm_B = get_imm(addr, 12))
+    return get_instruction("b", 
+    rs2 = get_reg(src2), 
+    rs1 = get_reg(src1), 
+    opcode = get_opcode("branch", False, False, False), 
+    funct3 = get_condition(condition), 
+    imm_B = get_imm(addr, 12))
 
 def mov_imm(dest, imm):
     return op_imm("add", dest, 0, imm)
@@ -105,16 +115,34 @@ def mov_reg(dest, reg):
     return op_reg("add", dest, 0, reg)
 
 def store(base, offset, src):
-    return get_instruction("s", imm_S = get_imm(offset, 12), rs2 = get_reg(src), rs1 = get_reg(base), funct3 = "000", opcode = get_opcode("none", True, False, True))
+    return get_instruction("s", 
+    imm_S = get_imm(offset, 12), 
+    rs2 = get_reg(src), 
+    rs1 = get_reg(base), 
+    funct3 = "000", 
+    opcode = get_opcode("none", True, False, True))
 
 def load(dest, base, offset):
-    return get_instruction("i", imm_I = get_imm(offset, 12), rs1 = get_reg(base), rd = get_reg(dest), funct3 = "000", opcode = get_opcode("none", True, True, False) )
+    return get_instruction("i", 
+    imm_I = get_imm(offset, 12), 
+    rs1 = get_reg(base), 
+    rd = get_reg(dest), 
+    funct3 = "000", 
+    opcode = get_opcode("none", True, True, False) )
 
 def jump(dest, offset):
-    return get_instruction("j", imm_J = get_imm(offset, 20), rd = get_reg(dest), opcode = get_opcode("jal", True, False, False))
+    return get_instruction("j",
+    imm_J = get_imm(offset, 20), 
+    rd = get_reg(dest), 
+    opcode = get_opcode("jal", True, False, False))
 
 def jump_reg(dest, base, offset):
-    return get_instruction("i", imm_I = get_imm(offset, 12), rd = get_reg(dest), rs1 = get_reg(base), funct3 = get_op("add"), opcode = get_opcode("jalr", True, False, False, False, False))
+    return get_instruction("i", 
+    imm_I = get_imm(offset, 12), 
+    rd = get_reg(dest), 
+    rs1 = get_reg(base), 
+    funct3 = get_op("add"), 
+    opcode = get_opcode("jalr", True, False, False, False, False))
 
 def lui(dest, imm):
     return get_instruction("u", imm_U = get_imm(imm, 20), rd = get_reg(dest), opcode = get_opcode("none", True, False, False, True, False))
@@ -223,5 +251,9 @@ prog_test_alu = [
     lui(0, 5),
     auipc(0, 5)
  ]
-print_prog(prog_test_jmp)
+prog_test_jmp2 =[
+
+]
+
+#print_prog(prog_test_jmp)
 # print("\n"*60)
