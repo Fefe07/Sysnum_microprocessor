@@ -8,7 +8,6 @@ import sys
 
 
 from instructions import *
-from log_unit import clone
 
 def print_prog_file(p, f):
     # Imprime le programme construit p dans le fichier de sortie f
@@ -363,9 +362,4 @@ def compile(filename) :
 
 if __name__ == "__main__":
     compile(sys.argv[1])
-
-#if __name__ == "__main__":
-#    compile("test_pipeline.s")
-
-
 

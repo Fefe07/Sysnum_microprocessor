@@ -1,3 +1,0 @@
-#!/bin/sh
-python3 compiler.py clock_reel_time.s &&
-  echo "compile.out" | ../simulator/netlist_simulator.byte --print 0 --time 2 -q build/cpu.net
