@@ -6,17 +6,12 @@ Ce projet a été effectué dans le cadre d'un cours de systèmes numériques à
 ## Spécifications  
 Adressage mémoire sur 32 bits  
 Base ISA : RISC-V 32 bits  
-Granularité mémoire : 1 octet, taille des mots : 4 octets = 32 bits   
 32 registres de 32 bits  
 Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard)
 
-Extensions possibles :
-- [x] Multiplicateur
-- [x] Pipelining
-- [x] Bit shift
-
-
-N.B. Write tests with godbolt.org
+Extensions :
+- Multiplicateur
+- Diviseur
 
 ## Compilation & Simulation
 Une fois les bons chemins relatifs mis à jour (cf. plus bas) vous pouvez:
@@ -27,24 +22,23 @@ Une fois les bons chemins relatifs mis à jour (cf. plus bas) vous pouvez:
 - et donc si vous voulez compiler puis simuler circuit.py :
 `make circuit sim`
 
-Pour que cela fonctionne, il faut évidemment qu'il connaisse les chemins vers votre carotte.py et votre simulateur. 
+Pour que cela fonctionne, il faut que le microprocesseur connaisse les chemins vers carotte.py et vers le simulateur. 
 Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte :
 - Sysnum_microprocessor
 - carotte.py (https://github.com/CarottePy/carotte.py)
 - Netlist_simulator (https://github.com/Acssiohm/Netlist_simulator),
-
-avec le fichier carotte.py dans le dossier carotte.py et le fichier netlist_simulator.byte dans le dossier Netlist_simulator. Si ce n'est pas le cas, vous pouvez regarder le fichier config.mk et les mettre à jour. 
+(il faut que le fichier carotte.py soit dans le dossier carotte.py et le fichier netlist_simulator.byte dans le dossier Netlist_simulator -- si ce n'est pas le cas, vous pouvez regarder le fichier config.mk et les mettre à jour)
 
 ## Compilation de code assembleur pour le microprocesseur
 
-Le fichier compiler.py permet de convertir du code assembleur ISA 32 bits en code machine pour le microprocesseur.  
-Pour cela, il faut écrire le code dans un fichier, puis appeler la fonction python compile sur le chemin relatif du fichier, par exemple :  
+Le fichier compiler.py permet de convertir du code assembleur ISA 32 bits en code machine pour le microprocesseur.
+Pour cela, il faut écrire le code dans un fichier, puis appeler la fonction python compile sur le chemin relatif du fichier, par exemple :
 ```compile("compiler_test.s")```  
 Le code produit est mis dans le fichier compile.out.  
 
 Le code produit peut alors être exécuté par le cpu, en le lançant avec `make cpu sim` puis en indiquant l'emplacement du code à exécuter (ici `./compile.out`).  
 
-# CPU_pipeline
+# Version de CPU avec pipeline
 Compiler le circuit : make cpu pipeline
 Lancer la simulation : make sim pipelin
 Quand le simulateur demande le fichier ROM, indiquer le chemin vers le programme compilé (ex : ./compile.out)
