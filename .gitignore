@@ -209,3 +209,11 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+presentation/slides.nav
+presentation/slides.out
+presentation/slides.aux
+presentation/slides.fdb_latexmk
+presentation/slides.fls
+presentation/slides.snm
+presentation/slides.synctex.gz
+presentation/slides.toc
