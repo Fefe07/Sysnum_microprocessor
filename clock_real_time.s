@@ -24,17 +24,17 @@
   blt x2, x19, "4f"
   sub x2, x2, x19
   addi x4, x4, 1
-  lw x4, x0, 8
-  lw x2, x0, 4
-  lw x1, x0, 0
+  sw x4, x0, 8
+  sw x2, x0, 4
+  sw x1, x0, 0
   jal x0, "1b"
 2:
   blt x2, x20, "5f"
   sub x2, x2, x20
   addi x4, x4, 1
-  lw x4, x0, 8
-  lw x2, x0, 4
-  lw x1, x0, 0
+  sw x4, x0, 8
+  sw x2, x0, 4
+  sw x1, x0, 0
   jal x0, "1b"
 4:
   addi x29, x0, 31
@@ -114,12 +114,12 @@
   rem x9, x2, x13
 
 
-  lw x6, x0, 4 
-  lw x5, x0, 8
-  lw x4, x0, 12
-  lw x7, x0, 16
-  lw x8, x0, 20
-  lw x9, x0, 24
+  sw x6, x0, 4 
+  sw x5, x0, 8
+  sw x4, x0, 12
+  sw x7, x0, 16
+  sw x8, x0, 20
+  sw x9, x0, 24
 9:
-  lw x1, x0, 0
+  sw x1, x0, 0
   jal x0, "9b"
