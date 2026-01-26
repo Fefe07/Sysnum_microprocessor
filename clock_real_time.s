@@ -1,23 +1,111 @@
-  addi x6, x0, 1
-  addi x7, x0, 60
-  addi x8, x0, 1800
-  add x8, x8, x8
-  addi x9, x0, 24
-  mul x10, x8, x9
-  lw x2, x0, 8
+  addi x1, x0, 1
+  addi x13, x0, 60
+  addi x14, x0, 400
+  addi x15, x0, 100
+  addi x16, x0, 4
+  addi x17, x0, 365
+  addi x18, x0, 366
+  mul x12, x13, x13
+  addi x25, x0, 24
+  mul x11, x12, x25
+  mul x19, x17, x11
+  mul x20, x18, x11
+  addi x4, x0, 1970
+  addi x5, x0, 1
+  lw x2, x0, 28
 1:
-  lw x3, x0, 8
-  beq x3, x2, "1b"
-  rem x4, x3, x10
-  addi x2, x3, 0
-  div x5, x4, x8
-  sw x5, x0, 4
-  sw x6, x0, 0
-  rem x4, x4, x8
-  div x5, x4, x7
-  sw x5, x0, 4
-  sw x6, x0, 0
-  rem x5, x4, x7
-  sw x5, x0, 4
-  sw x6, x0, 0
-  jal x12, "1b"
+  rem x25, x4, x14
+  beq x25, x0, "2f"
+  rem x25, x4, x15
+  beq x25, x0, "3f"
+  rem x25, x4, x16
+  beq x25, x0, "2f"
+3:
+  blt x2, x19, "4f"
+  sub x2, x2, x19
+  addi x4, x4, 1
+  jal x0, "1b"
+2:
+  blt x2, x20, "5f"
+  sub x2, x2, x20
+  addi x4, x4, 1
+  jal x0, "1b"
+4:
+  addi x29, x0, 31
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 28
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  jal x0, "7f"
+5:
+  addi x29, x0, 31
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 29
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+7:
+  addi x29, x0, 31
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 30
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 31
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 30
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 31
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 31
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 30
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 31
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+  addi x29, x0, 30
+  mul x30, x11, x29
+  blt x2, x30, "6f"
+  addi x5, x5, 1
+  sub x2, x2, x30
+6:
+  div x6, x2, x11
+  rem x2, x2, x11
+
+  lw x6, x0, 4 
+  lw x5, x0, 8
+  lw x4, x0, 12
+9:
+  lw x1, x0, 0
+  jal x0, "9f"

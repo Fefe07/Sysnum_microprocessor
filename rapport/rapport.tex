@@ -168,7 +168,7 @@ Pour contourner les problèmes liés à cpu\_pipeline, nous avons un simulateur 
 
 \section{Horloge}
 
-Deux codes d'horloge ont été développés. Pour pouvoir afficher des nombres, nous avons préféré simuler des périphériques plutôt que d'afficher à chaque coup d'horloge le contenu d'un registre. Le simulateur de netlist permet donc de définir 64 bits un périphérique de sortie textuel. On écrit dans les 32 derniers bits la donnée à afficher, et ceux-ci seront affichés lorsqu'une valeur non nulle sera mise dans les 32 premiers bits.
+Deux codes d'horloge ont été développés. Pour pouvoir afficher des nombres, nous avons préféré simulé des périphériques plutôt que d'afficher à chaque coup d'horloge le contenu d'un registre. Le simulateur de netlist permet donc de définir 7*32 bits un périphérique de sortie textuel. On écrit dans les 6*32 derniers bits l'heure à afficher, et ceux-ci seront affichés lorsqu'une valeur non nulle sera mise dans les 32 premiers bits.
 Les deux codes d'horloge utilise cette fonctionnalité. De plus pour l'horloge en temps réel, nous avions ajouté la possibilité de brider la fréquence du netlist. Nous avons finalement opté pour une autre option : simuler un périphérique d'horloge, qui donnerai le temps Unix en secondes. Ainsi, on peut définir 32 bits de la RAM comme contenant en permanence le temps. L'horloge en temps réel utilise cette fonctionnalité, et affiche donc toujours la bonne heure en UTC+0.
 
 Des exécutable clock et clock\_real\_time permettent de réaliser la compilation de l'assembleur et de lancer le simulateur avec les bonnes options. Notez qu'il faut activer le diviseur et le multiplieur pour l'horloge en temps réel.
