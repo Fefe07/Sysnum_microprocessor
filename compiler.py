@@ -2,6 +2,7 @@
 # Compiler assembly to code
 #######################
 
+import sys
 
 # TODO : push, pop, call, ret, register aliases(done)
 
@@ -361,7 +362,7 @@ def compile(filename) :
     file_in.close()
 
 if __name__ == "__main__":
-    compile("clock_reel_time.s")
+    compile(sys.argv[1])
 
 #if __name__ == "__main__":
 #    compile("test_pipeline.s")
