@@ -7,7 +7,7 @@
   lw x2, x0, 8
 1:
   lw x3, x0, 8
-  beq x3, x2, "1f"
+  beq x3, x2, "1b"
   rem x4, x3, x10
   addi x2, x3, 0
   div x5, x4, x8
@@ -20,4 +20,4 @@
   rem x5, x4, x7
   sw x5, x0, 4
   sw x6, x0, 0
-  jal x12, "1f"
+  jal x12, "1b"
