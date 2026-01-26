@@ -281,7 +281,7 @@ def compile(filename) :
                         case ("bgeu", _) :
                             program.append(branch("geu", val_1, val_2, val_3))
                         case ("bleu", _) :
-                            program.append(branch("geu", val_2 val_1, val_3))
+                            program.append(branch("geu", val_2, val_1, val_3))
                         case ("jalr", True) :
                             program.append(jump_reg(val_1, val_2, val_3))
                         case ("lw", True) :
