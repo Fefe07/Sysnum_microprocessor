@@ -1,8 +1,7 @@
   addi x6, x0, 1
   addi x7, x0, 60
   addi x8, x0, 1800
-  addi x9, x0, 1800
-  addi x8, x8, x9
+  add x8, x8, x8
   lw x1, x0, 8
   addi x2, x1, 0
   lw x3, x0, 8
