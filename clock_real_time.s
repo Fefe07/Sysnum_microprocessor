@@ -10,6 +10,7 @@
   mul x11, x12, x25
   mul x19, x17, x11
   mul x20, x18, x11
+9:
   addi x4, x0, 1970
   addi x5, x0, 1
   lw x2, x0, 28
@@ -107,6 +108,7 @@
   sub x2, x2, x30
 6:
   div x6, x2, x11
+  addi x6, x6, 1
   rem x2, x2, x11
   div x7, x2, x12
   rem x2, x2, x12 
@@ -120,6 +122,5 @@
   sw x7, x0, 16
   sw x8, x0, 20
   sw x9, x0, 24
-9:
   sw x1, x0, 0
   jal x0, "9b"
