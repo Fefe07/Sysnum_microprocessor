@@ -1,4 +1,8 @@
-
+.test
+    addi x20, x20, 42
+    sw x20, x0, 0
+    beq x0, x0, "test"
+    
     lui s4, 5
     auipc x20, 0
 

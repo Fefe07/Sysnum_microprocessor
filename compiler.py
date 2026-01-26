@@ -20,18 +20,26 @@ def print_prog_file(p, f):
             need_pos = True
     f.write("\n")
 
-def get_words(line) :
-    # while line == "\n" :
-    #     line = file_in.readline()
-    if line[-1]=='\n' :
-        line = line[:len(line)-1]
-    line = line.replace(',', ' ')
-    
+def get_line_words(file_in) :
 
-    print(line)
-    words = line.split(' ')
-    while '' in words :
-        words.remove('')
+    words = []
+
+
+    while words == [] : 
+        line = file_in.readline()
+        while line == "" :
+            line = file_in.readline()
+            if not line :
+                return None, None
+        if line[-1]=='\n' :
+            line = line[:len(line)-1]
+        line = line.replace(',', ' ')
+        
+
+        print(line)
+        words = line.split(' ')
+        while '' in words :
+            words.remove('')
 
     for i in range(1,len(words)) :
 #gestion des alias 
@@ -70,46 +78,52 @@ def get_words(line) :
         words[i] = words[i].replace('t6', 'x31')
 
     
-
-    return words
+    #print(line)
+    return line, words
     
 def compile(filename) :
 
-    #Premier passage pour repérer les labels
-    # labels = {}
-    # program = []
-    # file_in = open(filename, "r")
+    # Premier passage pour repérer les labels
+    labels = {}
+    program = []
+    file_in = open(filename, "r")
     # line = file_in.readline()
     # while line and line == "\n" :
     #     line = file_in.readline()
-    # n = 0
-    # while line :
-    #     words = get_words(line)
-    #     if words[0][0] == '.' :
-    #         name = words[0][1:]
-    #         if name[-1]==':' :
-    #             name = name[:len(name)-1]
-    #         labels[name]= n 
-    #         # program.append()
-    #     n += 1
-    #     line = file_in.readline()
-    #     while line and line == "\n" :
-    #         line = file_in.readline()
-    # file_in.close()
-    # print("labels :")
-    # print(labels)
+    line,words = get_line_words(file_in)
+    n = 0
+    while line :
+        #words = get_line_words(file_in)
+        if words[0][0] == '.' :
+            name = words[0][1:]
+            if name[-1]==':' :
+                name = name[:len(name)-1]
+            labels[name]= n 
+            # program.append()
+        else :
+            # n compte les lignes de code
+            n += 1
+        # line = file_in.readline()
+        # while line and line == "\n" :
+        #     line = file_in.readline()
+        line,words = get_line_words(file_in)
+    file_in.close()
+    print("labels :")
+    print(labels)
 
 
     program = []
     file_in = open(filename, "r")
     file_out = open("compile.out", "w")
+    n = 0
+    # line = file_in.readline()
+    # while line and line == "\n" :
+    #     line = file_in.readline()
+    line,words = get_line_words(file_in)
 
-    line = file_in.readline()
-    while line and line == "\n" :
-        line = file_in.readline()
-    while line :
+    while line!=None :
         #print(line)
-        words = get_words(line)
+        #words = get_words(line)
         #print(words[0])
 
         # if words[0][0] == "." :
@@ -139,6 +153,11 @@ def compile(filename) :
                 val_1 = int(words[1][1:])
                 is_cst_1 = False
             
+            elif words[1][0] == '"' :
+                # labels
+                val_1 = 4*(labels[words[1][1:-1]] - n)
+                is_cst_1 = True
+
             else :
                 val_1 = int(words[1])
                 is_cst_1 = True
@@ -149,6 +168,10 @@ def compile(filename) :
                 if words[2][0] == "x" :
                     val_2 = int(words[2][1:])
                     is_cst_2 = False
+                elif words[2][0] == '"' :
+                    # labels
+                    val_2 = 4*(labels[words[2][1:-1]] - n)
+                    is_cst_2 = True
                 else :
                     #assert(False)
                     val_2 = int(words[2])
@@ -160,6 +183,10 @@ def compile(filename) :
                     if words[3][0] == "x" :
                         val_3 = int(words[3][1:])
                         is_cst_3 = False
+                    elif words[3][0] == '"' :
+                        # labels
+                        val_3 = 4*(labels[words[3][1:-1]] - n)
+                        is_cst_3 = True
                     else :
                         val_3 = int(words[3])
                         is_cst_3 = True
@@ -282,11 +309,16 @@ def compile(filename) :
             match words[0] :
                 case("ret") :
                     program.append(ret())
+            
+            if words[0][0] == "." :
+                n -= 1 
+        n+=1
         
 
-        line = file_in.readline()
-        while line and line == "\n" :
-            line = file_in.readline()
+        # line = file_in.readline()
+        # while line and line == "\n" :
+        #     line = file_in.readline()
+        line, words = get_line_words(file_in)
 
     print_prog(program)
     print_prog_file(program,file_out)

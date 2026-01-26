@@ -30,3 +30,14 @@ Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte.
 
 avec le fichier carotte.py dans le dossier carotte.py et le fichier netlist_simulator.byte dans le dossier Netlist_simulator. 
 Si ce n'est pas le cas, vous pouvez regarder le fichier config.mk et les mettre à jour. 
+
+# Compilation de code assembleur pour le microprocesseur
+
+Le fichier compiler.py permet de convertir du code assembleur ISA 32 bits en code machine pour le microprocesseur.  
+Pour cela, il faut écrire le code dans un fichier, puis appeler la fonction python _compile_ sur le chemin relatif du fichier, par exemple :  
+```compile("compiler_test.ass")```
+Le code produit est mis dans le fichier _compile.out_   
+
+Le code produit peut alors être éxécuté par le cpu, en le lançant avec 
+```make cpu sim```
+puis en indiquant l'emplacement du code à éxécuter (ici _./compile.out_).  
