@@ -367,7 +367,8 @@ def compile(filename) :
 if __name__ == "__main__":
     compile("clock_reel_time.s")
 
-
+#if __name__ == "__main__":
+#    compile("test_pipeline.s")
 
 
 
