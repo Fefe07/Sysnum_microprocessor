@@ -40,9 +40,14 @@ Le code produit peut alors être exécuté par le cpu, en le lançant avec `make
 
 # Version de CPU avec pipeline
 Compiler le circuit : make cpu pipeline
-Lancer la simulation : make sim pipelin
-Quand le simulateur demande le fichier ROM, indiquer le chemin vers le programme compilé (ex : ./compile.out)
-Par ailleurs, le CPU_pipeline n'est pas compatible avec la clock.
+Créer un fichier assembleur .s avec seulement addi, add, lw, sw, qui est du type:
+      addi x1, x0, 5
+      addi x2, x0, 3
+      add x3, x1, x2
+      sw x3, x0, 0
+Compiler: python3 compiler.py test.s
+Simuler: python3 test_pipeline.py
+Note: CPU_pipeline n'est pas compatible avec la clock et sa simulation passe par test_pipeline.py
 
 ## English
 The netlist encoding of a microprocessor made in group for a digital systems course in ENS Paris.
