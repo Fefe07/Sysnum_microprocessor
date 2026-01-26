@@ -19,15 +19,19 @@ Le code produit est mis dans le fichier compile.out.
 Le code produit peut alors être exécuté par le cpu, en le lançant avec `make cpu sim` puis en indiquant l'emplacement du code à exécuter (ici `./compile.out`).  
 
 # Version de CPU avec pipeline
-Compiler le circuit : make cpu pipeline
+Etant donné que le simulateur est difficile à utiliser pour montrer ce qu'il se passe cycle par cycle dans cpu_pipeline, test_pipeline est une version qui marche seulement pour démontrer le fonctionnement sans passer par le netlist_simulator (qui est séquentiel et non parallèle).
+Test_pipeline :
 Créer un fichier assembleur .s avec seulement addi, add, lw, sw, qui est du type:
       addi x1, x0, 5
       addi x2, x0, 3
       add x3, x1, x2
       sw x3, x0, 0
-Compiler: python3 compiler.py test.s
+Compiler: python3 compiler.py fichier.s
 Simuler: python3 test_pipeline.py
-Note: CPU_pipeline n'est pas compatible avec la clock et sa simulation passe par test_pipeline.py
+
+Si tout de même vous voulez tester cpu_pipeline.py:
+Compiler le circuit : make cpu_pipeline
+Simuler le circuit : make sim_pipeline
 
 ## English
 The netlist encoding of a microprocessor made in group for a digital systems course in ENS Paris.
