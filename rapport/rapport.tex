@@ -159,6 +159,12 @@ Pour générer et simuler le CPU avec pipeline :
     \item Quand le simulateur demande le fichier ROM, indiquer le chemin vers le programme compilé (ex: \texttt{./compile.out})
 \end{enumerate}
 
+Pour contourner les problèmes liés à cpu\_pipeline, nous avons un simulateur simplifié qui supporte les instructions addi, add, lw, sw. 
+\begin{enumerate}
+    \item Créer un fichier assembleur .s
+    \item Compiler: python3 compiler.py fichier.s 
+    \item Simuler: python3 test\_pipeline.py
+\end{enumerate}
 
 \section{Horloge}
 clock.s incrémente les secondes, minutes et heures.
