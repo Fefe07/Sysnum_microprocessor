@@ -26,7 +26,7 @@ Créer un fichier assembleur .s avec seulement addi, add, lw, sw, qui est du typ
       addi x2, x0, 3
       add x3, x1, x2
       sw x3, x0, 0
-Compiler: python3 compiler.py test.s
+Compiler: python3 compiler.py fichier.s
 Simuler: python3 test_pipeline.py
 
 Si tout de même vous voulez tester cpu_pipeline.py:
