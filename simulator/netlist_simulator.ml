@@ -85,7 +85,18 @@ let print_module ram =
   if !print_address >= 0 then 
     Hashtbl.iter (fun _ r -> 
       if int_of_value(r.(!print_address)) <> 0 then 
-        (print_int (int_of_value r.(!print_address + 1)); print_newline ();
+        (print_int (int_of_value r.(!print_address + 1));
+          print_char '/';
+          print_int (int_of_value r.(!print_address + 2));
+          print_char '/';
+          print_int (int_of_value r.(!print_address + 3));
+          print_char ' ';
+          print_int (int_of_value r.(!print_address + 4));
+          print_char ':';
+          print_int (int_of_value r.(!print_address + 5));
+          print_char ':';
+          print_int (int_of_value r.(!print_address + 6));
+          print_newline ();
         r.(!print_address) <- (VBitArray (Array.make 32 false)))) ram
       else ()
 
