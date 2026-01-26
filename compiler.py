@@ -364,8 +364,8 @@ def compile(filename) :
 
     file_in.close()
 
-
-compile("clock_reel_time.s")
+if __name__ == "__main__":
+    compile("clock_reel_time.s")
 
 
 
