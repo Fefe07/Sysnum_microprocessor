@@ -54,7 +54,7 @@
 
 \maketitle
 
-Ce rapport présente l'implémentation d'un microprocesseur RISC-V 32 bits. Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel. Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). Par ailleurs, la granularité mémoire est de 1 octet et la taille des mots de 4 octets, soit 32 bits.
+Ce rapport présente l'implémentation d'un microprocesseur RISC-V 32 bits. Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel. Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). 
 
 \section{Introduction}
 
@@ -218,7 +218,7 @@ Ce projet a permis de concevoir :
 
 \begin{itemize}
     \item Un processeur RISC-V 32 bits avec multiplicateur et diviseur
-    \item Un  compilateur qui traduit le code assembleur en binaire
+    \item Un  compilateur qui traduit le code assembleur
     \item Une horloge pour l'application
     \item Une tentative de version de cpu pipelinée avec forwarding et gestion des hazards
 \end{itemize}
