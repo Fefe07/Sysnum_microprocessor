@@ -1,6 +1,6 @@
 # Sysnum_microprocessor
 Ce projet contient la netlist correspondant à un microprocesseur.
-La netlist a été obtenue en compilant du code python avec [Link text](https://github.com/CarottePy/carotte.py)
+La netlist a été obtenue en compilant du code python avec [carotte.py](https://github.com/CarottePy/carotte.py)
 
 # Spécifications  
 Adressage mémoire sur 32 bits  
@@ -28,9 +28,9 @@ Une fois les bons chemins relatifs mis à jour (cf. plus bas) vous pouvez:
 
 Pour que cela fonctionne, il faut évidemment qu'il connaisse les chemins vers votre carotte.py et votre simulateur. 
 Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte.
-- carotte.py
 - Sysnum_microprocessor
-- Netlist_simulator
+- carotte.py https://github.com/CarottePy/carotte.py
+- Netlist_simulator https://github.com/Acssiohm/Netlist_simulator
 
 avec le fichier carotte.py dans le dossier carotte.py et le fichier netlist_simulator.byte dans le dossier Netlist_simulator. 
 Si ce n'est pas le cas, vous pouvez regarder le fichier config.mk et les mettre à jour. 
@@ -39,10 +39,10 @@ Si ce n'est pas le cas, vous pouvez regarder le fichier config.mk et les mettre 
 
 Le fichier compiler.py permet de convertir du code assembleur ISA 32 bits en code machine pour le microprocesseur.  
 Pour cela, il faut écrire le code dans un fichier, puis appeler la fonction python `compile` sur le chemin relatif du fichier, par exemple :  
-```compile("compiler_test.ass")```
+```compile("compiler_test.ass")```  
 Le code produit est mis dans le fichier `compile.out`.  
 
-Le code produit peut alors être éxécuté par le cpu, en le lançant avec `make cpu sim` puis en indiquant l'emplacement du code à éxécuter (ici `./compile.out`).  
+Le code produit peut alors être exécuté par le cpu, en le lançant avec `make cpu sim` puis en indiquant l'emplacement du code à exécuter (ici `./compile.out`).  
 
 # English
 The netlist encoding of a microprocessor made in group for a digital systems course 
