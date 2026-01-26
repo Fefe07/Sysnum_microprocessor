@@ -1,5 +1,5 @@
 build :
-	opam exec dune -- build  # pas nécessaire, c'est juste pour l'AST
+	opam exec dune -- build
 	ocamlbuild netlist_simulator.byte 
 
 % : %.net
