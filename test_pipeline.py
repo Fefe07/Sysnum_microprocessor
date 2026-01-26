@@ -1,4 +1,4 @@
-#pour tester la pipeline, mais ne marche qu'avec ces 4 instructions: addi add lw et sw
+#pour simuler la pipeline sur une partie limitée, car ne marche qu'avec ces instructions: addi add lw sw
 import sys
 
 def decode(b):
