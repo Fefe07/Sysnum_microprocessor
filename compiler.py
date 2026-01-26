@@ -287,6 +287,14 @@ def compile(filename) :
                         case ("lw", True) :
                             # destination puis source puis offset
                             program.append(load(val_1, val_2, val_3))
+                        case ("div", False):
+                            program.append(op_reg("div", val_1, val_2, val_3))
+                        case ("divu", False):
+                            program.append(op_reg("divu", val_1, val_2, val_3))
+                        case ("rem", False):
+                            program.append(op_reg("rem", val_1, val_2, val_3))
+                        case ("remu", False):
+                            program.append(op_reg("remu", val_1, val_2, val_3))
                         #lb, lbu, lh, lhu plus compliqués car il faut modifier le mot chargé 
 
                         # case ("lbu", True) :
@@ -356,8 +364,8 @@ def compile(filename) :
 
     file_in.close()
 
-# Modifier cette ligne pour compiler un autre code
-compile("clock.s")
+
+compile("clock_reel_time.s")
 
 
 
