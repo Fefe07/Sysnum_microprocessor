@@ -343,7 +343,7 @@ def compile(filename) :
     file_in.close()
 
 # Modifier cette ligne pour compiler un autre code
-compile("compiler_test.ass")
+compile("clock.s")
 
 
 
