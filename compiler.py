@@ -273,7 +273,7 @@ def compile(filename) :
                     case("pop", False) :
                         program.append(pop(val_1))
                     case("push", False) :
-                        program.appnd(push(val_1))
+                        program.append(push(val_1))
 
 
             else :

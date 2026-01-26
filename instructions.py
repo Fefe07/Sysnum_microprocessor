@@ -271,4 +271,4 @@ prog_test_muldiv = [
 ]
 
 if __name__ == "__main__":
-    print_prog(progfibo)
+    print_prog(prog_fibo)
