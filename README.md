@@ -44,5 +44,11 @@ Le code produit est mis dans le fichier compile.out.
 
 Le code produit peut alors être exécuté par le cpu, en le lançant avec `make cpu sim` puis en indiquant l'emplacement du code à exécuter (ici `./compile.out`).  
 
+# CPU_pipeline
+Compiler le circuit : make cpu pipeline
+Lancer la simulation : make sim pipelin
+Quand le simulateur demande le fichier ROM, indiquer le chemin vers le programme compilé (ex : ./compile.out)
+Par ailleurs, le CPU_pipeline n'est pas compatible avec la clock.
+
 ## English
 The netlist encoding of a microprocessor made in group for a digital systems course in ENS Paris.
