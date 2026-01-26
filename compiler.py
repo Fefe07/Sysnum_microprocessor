@@ -5,6 +5,7 @@
 import sys
 
 # TODO : push, pop, call, ret, register aliases(done)
+# Pas de push pop en RISC-V
 
 
 from instructions import *
@@ -30,6 +31,7 @@ def get_line_words(file_in) :
     # élimination des lignes blanches
     while words == [] : 
         line = file_in.readline()
+        print(line)
         while line == "" :
             line = file_in.readline()
             if not line :
@@ -80,14 +82,14 @@ def get_line_words(file_in) :
         words[i] = words[i].replace('t5', 'x30')
         words[i] = words[i].replace('t6', 'x31')
 
-    #print(line)
+    print(line)
     return line, words
     
 def get_val_from_label(label, labels, labels_num, n) :
     # Permet de calculer le décalage relatif à partir du label
     # Gros calculs à cause de la fonctionnalité 1b/1f
 
-    if int(label[0]) in list(range(1,10)):
+    if label[0] in ["1", "2", "3", "4", "5", "6", "7", "8", "9"]:
         if len(label)!=2 :
             print("Syntaxes autorisées pour labels commençant par un chiffre (i) : if et ib")
         assert(len(label)==2)
@@ -127,7 +129,9 @@ def compile(filename) :
     ## Premier passage pour repérer les labels
 
     labels = {}
-    labels_num = 9*[[]]
+    labels_num = [] 
+    for _ in range(9) :
+        labels_num.append([])
 
     program = []
     file_in = open(filename, "r")
@@ -141,7 +145,7 @@ def compile(filename) :
             name = words[0][:-1]
             # if name[-1]==':' :
             #     name = name[:len(name)-1]
-            if int(name) in list(range(1,10)) :
+            if name in ["1", "2", "3", "4", "5", "6", "7", "8", "9"] :
                 labels_num[int(name)-1].append(n)
             else :
                 labels[name]= n 
@@ -151,10 +155,10 @@ def compile(filename) :
 
         line,words = get_line_words(file_in)
     file_in.close()
-    # print("labels :")
-    # print(labels)
-    # print("labels_num :")
-    # print(labels_num)
+    print("labels :")
+    print(labels)
+    print("labels_num :")
+    print(labels_num)
 
 
     ## Second passge : construction du programme 
@@ -166,6 +170,8 @@ def compile(filename) :
     n = 0
 
     line,words = get_line_words(file_in)
+    while len(words) == 1 and words[0][-1] == ':' :
+        line, words = get_line_words(file_in)
 
     while line != None :
 
@@ -195,6 +201,14 @@ def compile(filename) :
                     # labels
                     val_2 =  get_val_from_label(words[2][1:-1], labels, labels_num, n)
                     is_cst_2 = True
+                elif words[2][-1] == ")" :
+                    subwords = words[2].split("(")
+                    assert(len(subwords)==2)
+                    words[2] = subwords[1][:-1]
+                    words.append(subwords[0])
+                    val_2 = int(words[2][1])
+                    is_cst_2 = False
+
                 else :
                     val_2 = int(words[2])
                     is_cst_2 = True
@@ -337,6 +351,8 @@ def compile(filename) :
                         program.append(call(val_1))
                     case("j", True) :
                         program.append(jump(0,val_1))
+                    case _ :
+                        assert(False)
 
 
             else :
@@ -345,6 +361,8 @@ def compile(filename) :
             match words[0] :
                 case("ret") :
                     program.append(ret())
+                case _ : 
+                    assert(False)
             
             
         if words[0][-1] != ":" :
@@ -353,6 +371,8 @@ def compile(filename) :
         
 
         line, words = get_line_words(file_in)
+        while words != None and len(words) == 1 and words[0][-1] == ':' :
+            line, words = get_line_words(file_in)
 
     print_prog(program)
     print_prog_file(program,file_out)
@@ -361,11 +381,11 @@ def compile(filename) :
 
     file_in.close()
 
-if __name__ == "__main__":
-    compile(sys.argv[1])
+# if __name__ == "__main__":
+#     compile(sys.argv[1])
 
-#if __name__ == "__main__":
-#    compile("test_pipeline.s")
+if __name__ == "__main__":
+   compile("compiler_test.s")
 
 
 

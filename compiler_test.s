@@ -1,9 +1,20 @@
+    j "main"
+test: 
+    addi sp,sp,-16
+    sw ra, 0(sp)
+    addi a0, zero, 42
+    lw ra, 0(sp)
+    addi sp,sp,16
+    ret
+main:
+    sw a0, zero, 0
+    call "test"
+    sw a0, zero, 0
     mov x21, 42
     mov x20, 0
 1:
     addi x20, x20, 7
     bne x20, x21, "1b"
-    
     lui s4, 5
     auipc x20, 0
 
