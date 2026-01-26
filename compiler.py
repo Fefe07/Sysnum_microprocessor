@@ -222,6 +222,14 @@ def compile(filename) :
                             program.append(op_reg("add",val_1 ,val_2 ,val_3 ))
                         case ("sub", False) :
                             program.append(op_reg("sub",val_1 ,val_2 ,val_3 ))
+                        case ("mul", False) :
+                            program.append(op_reg("mul", val_1, val_2, val_3))
+                        case ("mulh", False) :
+                            program.append(op_reg("mulh", val_1, val_2, val_3))
+                        case ("mulhu", False) :
+                            program.append(op_reg("mulhu", val_1, val_2, val_3))
+                        case ("mulhsu", False) :
+                            program.append(op_reg("mulhsu", val_1, val_2, val_3))
                         case ("sll", False) :
                             program.append(op_reg("sll",val_1 ,val_2 ,val_3 ))
                         case ("slli", True) :
@@ -260,12 +268,20 @@ def compile(filename) :
                             program.append(branch("neq", val_1, val_2, val_3))
                         case ("blt", _) :
                             program.append(branch("lt", val_1, val_2, val_3))
+                        case ("bgt", _) :
+                            program.append(branch("lt", val_2, val_1, val_3))
                         case ("bge", _) :
                             program.append(branch("ge", val_1, val_2, val_3))
+                        case ("ble", _) :
+                            program.append(branch("ge", val_2, val_1, val_3))
                         case ("bltu", _) :
                             program.append(branch("ltu", val_1, val_2, val_3))
+                        case ("bgtu", _) :
+                            program.append(branch("ltu", val_2, val_1, val_3))
                         case ("bgeu", _) :
                             program.append(branch("geu", val_1, val_2, val_3))
+                        case ("bleu", _) :
+                            program.append(branch("geu", val_2 val_1, val_3))
                         case ("jalr", True) :
                             program.append(jump_reg(val_1, val_2, val_3))
                         case ("lw", True) :
@@ -279,12 +295,10 @@ def compile(filename) :
                         #     program.append(mov_reg(val_1, val_1))
                         case ("sw", True) :
                             program.append(store(val_2, val_3, val_1))
-
-
-
-                        
+   
                         case _ :
                             print("Opération non traitée")
+                            print("Peut-être avez vous utilisé un mot-clé pour immédiat et donné un registre ou inversement ?")
                             assert(False)
                             
 
