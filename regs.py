@@ -18,10 +18,10 @@ def register(data_in, write_en):
     reg_in = Mux(write_en, reg, data_in)
     return reg
 
-def registers(write_select, data_in, read_select_list, is_branch, is_jmp ) :
+def registers(write_select, data_in, rs1, rs2, is_branch, is_jmp, read_pc ) :
     assert is_jmp.bus_size == is_branch.bus_size == 1
-    for read_sel_i in read_select_list:
-        assert write_select.bus_size == read_sel_i.bus_size
+    write_select.bus_size == rs1.bus_size
+    write_select.bus_size == rs2.bus_size
     n = data_in.bus_size
     
     nb_bit_sel_reg = write_select.bus_size
@@ -34,10 +34,10 @@ def registers(write_select, data_in, read_select_list, is_branch, is_jmp ) :
     pc = Reg(Defer(n, lambda: actual_next_pc))
 
     next_pc, _ = adder(pc, Mux(is_branch, Constant("001"+(n-3)*"0"), data_in), Constant("0"))
-    actual_next_pc = Mux(write_en_signals[nb_regs-1] | is_jmp , next_pc, data_in)
-    regs = [Constant(reg_size*"0")] + [register(Mux(is_jmp, data_in,next_pc), write_en_signals[i]) for i in range(1, nb_regs-1)] + [ pc ] 
+    actual_next_pc = Mux(is_jmp , next_pc, data_in)
+    regs = [Constant(reg_size*"0")] + [register(Mux(is_jmp, data_in,next_pc), write_en_signals[i]) for i in range(1, nb_regs)]
      
-    return tuple([mux(read_select, concat(regs)) for read_select in read_select_list] + [pc])
+    return (Mux(read_pc, mux(rs1, concat(regs)), pc ), mux(rs2, concat(regs)),  pc)
 
 
 

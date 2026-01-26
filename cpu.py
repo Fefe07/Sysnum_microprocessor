@@ -47,10 +47,12 @@ def decoder(x):
     rd = Mux( is_branch | write_to_ram, rd_bits, Constant(5*"0"))
     is_muldiv = (~is_imm) & funct7[0]
     op_option = funct7[5] | is_branch # | is_branch c'est pour forcer la soustraction lors d'un test de saut conditionnel, mais on en a pas besoin car seuls les flags nous intéresse, et les flags sont mis dès que op[0] = 1
-    rs1_not_u = Mux(jmp_kind[0] & jmp_kind[1], rs1_bits, Constant(5*"1")) 
+    read_pc = jmp_kind[0] & jmp_kind[1]
+    rs1_not_u = Mux(read_pc, rs1_bits, Constant(5*"0"))
+
     rs1 = Mux(is_type_u, rs1_not_u, rs1_u)
     imm = Mux( is_type_u,  Mux(jmp_kind[0], Mux(write_to_ram, imm_I, imm_S), Mux(is_branch, imm_J, imm_B)), imm_U)
-    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_muldiv, is_jmp, is_branch, op_option
+    return rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_muldiv, is_jmp, is_branch, read_pc, op_option
 
 def cpu():
     allow_ribbon_logic_operations(True)
@@ -63,9 +65,9 @@ def cpu():
     ram_addr_size = 10
     # reg_addr_size = 5
 
-    vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), [Defer(5, lambda:rs1), Defer(5, lambda:rs2)], Defer(1, lambda: condition_met ), Defer(1, lambda: is_jmp))
+    vs1, vs2, pc = registers(Defer(5, lambda:rd), Defer(n, lambda: data_in_regs), Defer(5, lambda:rs1), Defer(5, lambda:rs2), Defer(1, lambda: condition_met ), Defer(1, lambda: is_jmp), Defer(1, lambda: read_pc))
     instruction = ROM(rom_addr_size, instruction_size, pc[2:rom_addr_size+2])
-    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_muldiv, is_jmp, is_branch, op_option = decoder(instruction)
+    rs1, rs2, rd, imm, op, is_imm, write_to_ram, read_from_ram, condition, is_muldiv, is_jmp, is_branch, read_pc, op_option = decoder(instruction)
     
     va = vs1
     vb = mux(is_imm, vs2 + imm) 

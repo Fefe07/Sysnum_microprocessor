@@ -182,6 +182,7 @@ def print_prog(p):
             print("0b"+i)
         else :
             need_pos = True
+    print()
 
 # Programme calculant la suite de fibonacci jusqu'à ce qu'elle dépasse 20
 prog_fibo = [
@@ -221,16 +222,16 @@ prog_fact = [
 ]
 
 prog_test_jmp = [
-    mov_imm(3, 20),
+    mov_imm(31, 20),
     mov_imm(1, 1),
     mov_imm(2, 1),
     mov_reg(4, 1),
     mov_reg(1, 2),
     mov_reg(2, 4),
     op_reg("add", 1, 1, 2),
-    store(3, -4, 1),
+    store(31, -4, 1),
     load(1, 0, 16), 
-    branch("ltu", 1, 3, -6*4),
+    branch("ltu", 1, 31, -6*4),
     jump(5, 50*4),
     '0',
     '0',
@@ -271,4 +272,4 @@ prog_test_muldiv = [
 ]
 
 if __name__ == "__main__":
-    print_prog(prog_fibo)
+    print_prog(prog_test_jmp)
