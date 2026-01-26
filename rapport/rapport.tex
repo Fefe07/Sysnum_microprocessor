@@ -38,7 +38,7 @@
 }
 
 \title{
-\vspace{-2cm}
+\color{violet}\vspace{-2cm}
 \hrule
 \vspace{0.5cm}
 \textbf{\Huge Microprocesseur RISC-V 32 bits}\\[0.3cm]
@@ -130,14 +130,14 @@ Un pipeline divise l'exécution d'une instruction en plusieurs étages. Pendant 
 
 Entre chaque étage, des registres inter-étages (IF/ID, ID/EX, EX/MEM, MEM/WB) mémorisent les données nécessaires pour l'étage suivant.\\
 
-Le pipeline introduit des problèmes appelés \textit{aléas ou hazards}. Ce sont des situations où une instruction ne peut pas s'exécuter correctement car elle dépend d'une instruction précédente qui n'a pas encore terminé. Cela survient quand une instruction a besoin d'une donnée qui n'est pas encore disponible. Par exemple :
+Le pipeline introduit des aléas ou des hazards. Ce sont des situations où une instruction ne peut pas s'exécuter correctement car elle dépend d'une instruction précédente qui n'a pas encore terminé. Cela survient quand une instruction a besoin d'une donnée qui n'est pas encore disponible. Par exemple :
 \begin{lstlisting}[style=asm]
     add x1, x2, x3
     sub x4, x1, x5
 \end{lstlisting}
-Ici, l'instruction \texttt{sub} essaie de lire x1 alors que \texttt{add} ne l'a pas encore écrit. Sans correction, \texttt{sub} lirait une ancienne valeur de x1.
+Ici, l'instruction \texttt{sub} essaie de lire x1 alors que \texttt{add} ne l'a pas encore écrit. 
 
-Un aléa de contrôle survient lors d'un branchement. On ne sait pas si le branchement sera pris tant que la condition n'est pas évaluée (étage EX). Entre-temps, des instructions ont déjà été chargées dans le pipeline. Le \textbf{forwarding} (\texttt{forwarding.py}) permet de résoudre la plupart des aléas de données sans perdre de cycles. L'idée est de transmettre directement le résultat d'un étage vers l'entrée de l'ALU, sans attendre qu'il soit écrit dans les registres. Concrètement, avant d'utiliser une valeur de registre dans l'étage EX, on vérifie si cette valeur est en train d'être calculée par une instruction précédente encore dans le pipeline :
+Un aléa de contrôle survient lors d'un branchement. On ne sait pas si le branchement sera pris tant que la condition n'est pas évaluée (étage EX). Entre-temps, des instructions ont déjà été chargées dans le pipeline. Le forwarding (forwarding.py) permet de résoudre la plupart des aléas de données sans perdre de cycles. L'idée est de transmettre directement le résultat d'un étage vers l'entrée de l'ALU, sans attendre qu'il soit écrit dans les registres. Avant d'utiliser une valeur de registre dans l'étage EX, on vérifie si cette valeur est en train d'être calculée par une instruction précédente encore dans le pipeline :
 \begin{itemize}
     \item Si le registre source correspond au registre destination de l'instruction en EX/MEM, on utilise directement la sortie de l'ALU de cette instruction.
     \item Sinon, si le registre correspond à celui de l'instruction en MEM/WB, on utilise la donnée qui va être écrite.
@@ -145,8 +145,8 @@ Un aléa de contrôle survient lors d'un branchement. On ne sait pas si le branc
 \end{itemize}
 Le forwarding depuis EX/MEM est prioritaire sur celui depuis MEM/WB, car il contient la valeur la plus récente.
 
-La détection des hazards (\texttt{hazards.py}) vérifie si l'instruction en EX est un load et si l'instruction en ID utilise le même registre destination.
-Quand un branchement est pris, les instructions qui ont été chargées après lui (dans IF et ID) ne doivent pas être exécutées. On les annule en les remplaçant par des bulles (on met leur registre destination à x0).
+La détection des hazards (hazards.py) vérifie si l'instruction en EX est un load et si l'instruction en ID utilise le même registre destination.
+Quand un branchement est pris, les instructions qui ont été chargées après lui (dans IF et ID) ne doivent pas être exécutées. On les annule en les remplaçant par des bulles.
 
 \subsection{État actuel du pipeline}
 
@@ -168,10 +168,10 @@ Pour contourner les problèmes liés à cpu\_pipeline, nous avons un simulateur 
 
 \section{Horloge}
 
-Deux codes d'horloge ont été développés. Pour pouvoir afficher des nombres, nous avons préféré simulé des périphériques plutôt que d'afficher à chaque coup d'horloge le contenu d'un registre. Le simulateur de netlist permet donc de définir 64 bits un périphérique de sortie textuel. On écrit dans les 32 derniers bits la donnée à afficher, et ceux-ci seront affichés lorsqu'une valeur non nulle sera mise dans les 32 premiers bits.
+Deux codes d'horloge ont été développés. Pour pouvoir afficher des nombres, nous avons préféré simuler des périphériques plutôt que d'afficher à chaque coup d'horloge le contenu d'un registre. Le simulateur de netlist permet donc de définir 64 bits un périphérique de sortie textuel. On écrit dans les 32 derniers bits la donnée à afficher, et ceux-ci seront affichés lorsqu'une valeur non nulle sera mise dans les 32 premiers bits.
 Les deux codes d'horloge utilise cette fonctionnalité. De plus pour l'horloge en temps réel, nous avions ajouté la possibilité de brider la fréquence du netlist. Nous avons finalement opté pour une autre option : simuler un périphérique d'horloge, qui donnerai le temps Unix en secondes. Ainsi, on peut définir 32 bits de la RAM comme contenant en permanence le temps. L'horloge en temps réel utilise cette fonctionnalité, et affiche donc toujours la bonne heure en UTC+0.
 
-Des exécutable clock et clock\_real\_time permettent de réaliser la compilation de l'assembleur et de lancer le simulateur avec les bonnes options. Notez qu'il faut activer le diviseur et le multiplieur poour l'horloge en temps réel.
+Des exécutable clock et clock\_real\_time permettent de réaliser la compilation de l'assembleur et de lancer le simulateur avec les bonnes options. Notez qu'il faut activer le diviseur et le multiplieur pour l'horloge en temps réel.
 
 \color{violet}\section{Tests et  utilisation}
 Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte :
@@ -198,3 +198,4 @@ Le code produit est mis dans le fichier compile.out.\\
 Le code produit peut alors être exécuté par le CPU, en le lançant avec make cpu sim puis en indiquant l'emplacement du code à exécuter (./compile.out). \\
 
 \end{document}
+
