@@ -16,7 +16,7 @@ Extensions possibles :
 - [x] Bit shift
 
 
-N.B. Write tests with gobbolt.org
+N.B. Write tests with godbolt.org
 
 ## Compilation & Simulation
 Une fois les bons chemins relatifs mis à jour (cf. plus bas) vous pouvez:
@@ -39,7 +39,7 @@ avec le fichier carotte.py dans le dossier carotte.py et le fichier netlist_simu
 
 Le fichier compiler.py permet de convertir du code assembleur ISA 32 bits en code machine pour le microprocesseur.  
 Pour cela, il faut écrire le code dans un fichier, puis appeler la fonction python compile sur le chemin relatif du fichier, par exemple :  
-```compile("compiler_test.ass")```  
+```compile("compiler_test.s")```  
 Le code produit est mis dans le fichier compile.out.  
 
 Le code produit peut alors être exécuté par le cpu, en le lançant avec `make cpu sim` puis en indiquant l'emplacement du code à exécuter (ici `./compile.out`).  
