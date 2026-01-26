@@ -6,10 +6,12 @@
 \usepackage{hyperref}
 \usepackage{fancyhdr}
 
+\definecolor{jaune}{RGB}{190,160,0}
+
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{Microprocesseur RISC-V}
-\lhead{Systèmes Numériques 2025 -2026}
+\lhead{\textbf{\color{jaune} Systèmes Numériques 2025--2026}}
+\rhead{\textbf{\color{jaune} Microprocesseur RISC-V}}
 \rfoot{\thepage}
 
 \lstdefinestyle{python}{
@@ -162,7 +164,7 @@ Pour générer et simuler le CPU avec pipeline :
 clock.s incrémente les secondes, minutes et heures.
 clock\_real\_time.s pemet d'avoir une horloge en temps réel.
 
-\section{Tests et  utilisation}
+\color{violet}\section{Tests et  utilisation}
 Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte :
 \begin{itemize}
     \item \texttt{Sysnum\_microprocessor}
