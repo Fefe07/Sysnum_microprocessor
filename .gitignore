@@ -1,6 +1,8 @@
 testing/
 test
 compile.out
+*.byte
+_build/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

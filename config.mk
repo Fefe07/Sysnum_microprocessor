@@ -1,4 +1,0 @@
-CAROTTE_PATH = ../carotte.py/carotte.py # Mettez le chemin relatif vers votre carotte.py 
-PYTHON_INTERPRETER = python3 # Si ça marche pas chais vous, essayez avec "python" ou "py"
-SIMULATOR = ./../Netlist_simulator/netlist_simulator.byte # Mettez le chemin vers votre simulateur netlist
-SIMULATOR_DIR = ./../Netlist_simulator/

@@ -1,3 +1,4 @@
 #!/bin/sh
+make -C ./netlist_cpu cpu &&
 python3 compiler.py clock.s &&
-  echo "compile.out" | ../Netlist_simulator/netlist_simulator.byte --print 0 --time 2 -q build/cpu.net
+  echo "compile.out" | ./simulator/netlist_simulator.byte --print 0 --time 2 -q ./netlist_cpu/build/cpu.net
