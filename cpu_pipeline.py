@@ -7,7 +7,7 @@ from lib_carotte import *
 from typing import *
 
 from arith_unit import adder
-from regs import register, registers
+from regs_pipeline import register, registers_pipeline
 from mux import mux
 from alu import alu
 from log_unit import b_or, clone
@@ -95,16 +95,19 @@ def cpu_pipeline():
     if_id_is_branch = register(is_branch, not_stall)
     if_id_condition = register(condition, not_stall)
     
-    # ID
+    # ID - Lecture des registres
     reg_write_en = Defer(1, lambda: wb_write_en)
     reg_write_addr = Defer(5, lambda: wb_rd)
     reg_write_data = Defer(n, lambda: wb_data)
-    actual_write_addr = Mux(Defer(1, lambda: wb_write_en), Constant("00000"), Defer(5, lambda: wb_rd))
-    rs1_val, rs2_val, _ = registers(
-    actual_write_addr, Defer(n, lambda: wb_data),
-    [if_id_rs1_addr, if_id_rs2_addr],
-    Constant("0"), Constant("0")
+    
+    read_values = registers_pipeline(
+        reg_write_addr,
+        reg_write_data,
+        [if_id_rs1_addr, if_id_rs2_addr],
+        reg_write_en
     )
+    rs1_val = read_values[0]
+    rs2_val = read_values[1]
     
     # ID/EX
     nop_rd = Constant("00000")
@@ -204,3 +207,6 @@ def main():
     stall.set_as_output("stall")
     branch_taken.set_as_output("branch_taken")
     id_ex_rd.set_as_output("id_ex_rd")
+
+if __name__ == "__main__":
+    main()
