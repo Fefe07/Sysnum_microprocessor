@@ -17,4 +17,4 @@ boucle:
   bne x2, x4, -40
   addi x2, x0, 0
   addi x3, x3, 1
-  j -52
+  jal x7, -52
