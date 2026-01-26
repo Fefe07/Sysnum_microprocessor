@@ -350,8 +350,8 @@ def compile(filename) :
 
     file_in.close()
 
-# Modifier cette ligne pour compiler un autre code
-compile("clock.s")
+
+compile("clock_reel_time.s")
 
 
 
