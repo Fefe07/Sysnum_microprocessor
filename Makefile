@@ -6,7 +6,7 @@ build:
 	$(CPU_MAKE) cpu
 
 run:
-	$(SIMULATOR_MAKE) sim
+	$(CPU_MAKE) sim
 
 clean:
 	$(SIMULATOR_MAKE) clean
