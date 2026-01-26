@@ -81,10 +81,50 @@ def get_line_words(file_in) :
     #print(line)
     return line, words
     
+def get_val_from_label(label, labels, labels_num, n) :
+    #label = words[1][1:-1]
+
+    if int(label[0]) in list(range(1,10)):
+        if len(label)!=2 :
+            print("Syntaxes autorisées pour labels commençant par un chiffre (i) : if et ib")
+        assert(len(label)==2)
+        k = int(label[0])-1
+        if label[1] == "f" :
+            i = 0 
+            while i < len(labels_num[k]) and labels_num[k][i] <= n :
+                i += 1
+            if i == len(labels_num[k]):
+                print("pas de label ", k, " après")
+                assert(False)
+            else :
+                val = 4*(labels_num[k][i] - n)
+        elif label[1] == "b" :
+            i = len(labels_num[k])-1 
+            while i >=0 and labels_num[k][i] > n :
+                print("n = ", n)
+                print("labels_num[k][i] = ", labels_num[k][i])
+                i -= 1
+            if i == -1:
+                print("pas de label ", k, " avant")
+                assert(False)
+            else :
+                val = 4*(labels_num[k][i] - n)
+        else :
+            print("Syntaxes autorisées pour labels commençant par un chiffre (i) : if et ib")
+            assert(False)
+
+
+    else :
+        val = 4*(labels[label] - n)
+    return val
+
+
 def compile(filename) :
 
     # Premier passage pour repérer les labels
     labels = {}
+    labels_num = 9*[[]]
+
     program = []
     file_in = open(filename, "r")
     # line = file_in.readline()
@@ -98,7 +138,10 @@ def compile(filename) :
             name = words[0][1:]
             if name[-1]==':' :
                 name = name[:len(name)-1]
-            labels[name]= n 
+            if int(name) in list(range(1,10)) :
+                labels_num[int(name)-1].append(n)
+            else :
+                labels[name]= n 
             # program.append()
         else :
             # n compte les lignes de code
@@ -110,6 +153,8 @@ def compile(filename) :
     file_in.close()
     print("labels :")
     print(labels)
+    print("labels_num :")
+    print(labels_num)
 
 
     program = []
@@ -155,7 +200,7 @@ def compile(filename) :
             
             elif words[1][0] == '"' :
                 # labels
-                val_1 = 4*(labels[words[1][1:-1]] - n)
+                val_1 = get_val_from_label(words[1][1:-1], labels, labels_num, n)
                 is_cst_1 = True
 
             else :
@@ -170,7 +215,7 @@ def compile(filename) :
                     is_cst_2 = False
                 elif words[2][0] == '"' :
                     # labels
-                    val_2 = 4*(labels[words[2][1:-1]] - n)
+                    val_2 =  get_val_from_label(words[2][1:-1], labels, labels_num, n)
                     is_cst_2 = True
                 else :
                     #assert(False)
@@ -185,7 +230,7 @@ def compile(filename) :
                         is_cst_3 = False
                     elif words[3][0] == '"' :
                         # labels
-                        val_3 = 4*(labels[words[3][1:-1]] - n)
+                        val_3 = get_val_from_label(words[3][1:-1], labels, labels_num, n)
                         is_cst_3 = True
                     else :
                         val_3 = int(words[3])
@@ -288,7 +333,10 @@ def compile(filename) :
                             program.append(lui(val_1, val_2))
                         case("auipc", True) :
                             program.append(auipc(val_1, val_2))
-                        
+                        case("mov", True) :
+                            program.append(mov_imm(val_1, val_2))
+                        case("mov", False) :
+                            program.append(mov_reg(val_1, val_2))
                         case _ : 
                             print("Opération non traitée")
                             assert(False)
