@@ -7,9 +7,9 @@ test:
     addi sp,sp,16
     ret
 main:
-    sw a0, zero, 0
+    sw a0, 0(zero)
     call "test"
-    sw a0, zero, 0
+    sw a0, 0(zero)
     mov x21, 42
     mov x20, 0
 1:
@@ -19,8 +19,8 @@ main:
     auipc x20, 0
 
     addi x20, x0, 42
-    sw x20, x0, 0
-    lw x22, x0, 0
+    sw x20, 0(x0)
+    lw x22, 0(x0)
     add x21, x22, x22
     addi x24, x0, 3
     sll x23, x20, x24
