@@ -5,13 +5,16 @@ include config.mk
 	$(PYTHON_INTERPRETER) $(CAROTTE_PATH) -o ./build/$@.net ./$@.py
 	cp ./build/$@.net ./build/current.net 
 
-sim :
+sim : $(SIMULATOR)
 	$(SIMULATOR) ./build/current.net
 
 all :
 	make alu log_unit arith_unit demux mux regs forwarding hazards
 
 update :
+	make -C $(SIMULATOR_DIR) build
+
+$(SIMULATOR):
 	make -C $(SIMULATOR_DIR) build
 
 clean :
