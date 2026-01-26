@@ -56,8 +56,8 @@ def decoder(x):
 
 def cpu():
     allow_ribbon_logic_operations(True)
-    DISABLE_MULTIPLICATION = True # ça peut ralentir significativement la compilation 
-    DISABLE_DIVISION = True
+    DISABLE_MULTIPLICATION = False # ça peut ralentir significativement la compilation 
+    DISABLE_DIVISION = False
     n = 32
     data_size = n
     instruction_size = 32
