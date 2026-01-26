@@ -1,7 +1,8 @@
-.1
-    addi x20, x20, 42
-    sw x20, x0, 0
-    beq x0, x0, "1b"
+    mov x21, 42
+    mov x20, 0
+1:
+    addi x20, x20, 7
+    bne x20, x21, "1b"
     
     lui s4, 5
     auipc x20, 0
