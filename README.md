@@ -3,31 +3,11 @@ Ce projet contient la netlist correspondant à un microprocesseur.
 La netlist a été obtenue en compilant du code python avec [carotte.py](https://github.com/CarottePy/carotte.py).  
 Ce projet a été effectué dans le cadre d'un cours de systèmes numériques à l'ENS Paris.
 
-## Spécifications  
-Adressage mémoire sur 32 bits  
-Base ISA : RISC-V 32 bits  
-32 registres de 32 bits  
-Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard)
-
-Extensions :
-- Multiplicateur
-- Diviseur
-
-## Compilation & Simulation
-Une fois les bons chemins relatifs mis à jour (cf. plus bas) vous pouvez:
-- compiler un circuit circuit.py avec :
-`make circuit`
-- lancer la simulation du dernier ciruit compilé avec :
-`make sim`
-- et donc si vous voulez compiler puis simuler circuit.py :
-`make circuit sim`
-
-Pour que cela fonctionne, il faut que le microprocesseur connaisse les chemins vers carotte.py et vers le simulateur. 
-Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte :
-- Sysnum_microprocessor
-- carotte.py (https://github.com/CarottePy/carotte.py)
-- Netlist_simulator (https://github.com/Acssiohm/Netlist_simulator),
-(il faut que le fichier carotte.py soit dans le dossier carotte.py et le fichier netlist_simulator.byte dans le dossier Netlist_simulator -- si ce n'est pas le cas, vous pouvez regarder le fichier config.mk et les mettre à jour)
+## Spécifications de base :
+CPU RISC-V 32 bits 
+Architecture Harvard : mémoire d'instructions et mémoire de données disjointes.
+ISA RISC-V de base quasi complète avec extension M 
+Toute adresse non alignée est tronquée ( modulo 4 octets )
 
 ## Compilation de code assembleur pour le microprocesseur
 
