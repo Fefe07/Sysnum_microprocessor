@@ -5,6 +5,9 @@ build:
 	$(SIMULATOR_MAKE) build 
 	$(CPU_MAKE) cpu
 
+cpu_pipeline:
+	$(CPU_MAKE) cpu_pipeline
+
 run:
 	$(CPU_MAKE) sim
 
