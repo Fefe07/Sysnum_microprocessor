@@ -29,14 +29,10 @@ let int_of_value v =
     | VBit b -> int_of_bool b
     | VBitArray arr -> int_of_bool_array arr 
 
-
-
-  
 let array_of_value v =
   match v with
     | VBit b -> [|b|]
     | VBitArray arr -> arr 
-
 
 let print_value v =
     let x = int_of_value v in
@@ -87,9 +83,11 @@ let read_value t =
 
 let print_module ram = 
   if !print_address >= 0 then 
-    Hashtbl.iter (fun _ r -> if int_of_value(r.(!print_address)) <> 0 then 
-      (print_int (int_of_value r.(!print_address + 1)); print_newline ();
-      r.(!print_address) <- (VBitArray (Array.make 32 false)))) ram
+    Hashtbl.iter (fun _ r -> 
+      if int_of_value(r.(!print_address)) <> 0 then 
+        (print_int (int_of_value r.(!print_address + 1)); print_newline ();
+        r.(!print_address) <- (VBitArray (Array.make 32 false)))) ram
+      else ()
 
 let varray_of_int i n = 
   let r = ref i in 
@@ -102,6 +100,7 @@ let time_module ram =
     Hashtbl.iter (fun _ r -> 
       r.(!time_address) <- varray_of_int (int_of_float (Unix.time ())) 32) ram
 
+
 let simulator program number_steps = 
   let vars = Hashtbl.create (List.length program.p_inputs) in
   let ram =  Hashtbl.create 5 in 
@@ -110,14 +109,6 @@ let simulator program number_steps =
   (* Create the RAMs *)
   List.iter (fun (x,e) -> match e with 
   | Eram (addr,word,_,_,_,_) -> 
-    (*print_endline ("Set some adresses of the RAM "^x^" as output :");
-    (try 
-    while true do
-      let n = read_number() in
-      assert (n mod 4 = 0);
-      mem_map := (n/4, x)::!mem_map
-    done
-    with | Failure s -> if s = "int_of_string" then () else failwith s );*)
     Hashtbl.replace ram x (Array.init (1 lsl addr) (fun _ -> value_of_type (TBitArray word) ))
   | _ -> () 
   ) program.p_eqs;
@@ -125,16 +116,13 @@ let simulator program number_steps =
   List.iter (fun (x,e) -> match e with 
   | Erom (addr,word,_) -> begin 
     Hashtbl.replace rom x (Array.init (1 lsl addr) (fun _ -> VBitArray (Array.make word false)));
-    print_endline ("Enter values for the ROM '"^x^"' (or enter to end) :");
-    print_endline ("Adress size is "^(string_of_int addr)^". Word size is "^(string_of_int word));
-    print_string "Get from file (or enter to put manually):";
+    print_string "Get instructions from file (or press enter to put them manually):";
     let filename = read_line() in 
-    let ch =  if filename = "" then Stdlib.stdin else Stdlib.open_in filename in 
+    let ch = if filename = "" then Stdlib.stdin else Stdlib.open_in filename in 
     let finish = ref false in
     let i = ref 0 in 
     while not !finish do
       try
-        if filename = "" then Printf.printf ">>>%!"; 
         let e = strip (Stdlib.input_line ch) in
         let s, is_address = if e <> "" && e.[0] = '.' then (String.sub e 1 ((String.length e)  - 1), true) else (e, false) in
         let n = int_of_string s in
@@ -229,7 +217,6 @@ let simulator program number_steps =
       List.iter exec_eq program.p_eqs;
       (* Writing the outputs *)
       if not !quiet then List.iter (fun output -> print_string ("=> "^output^" = "); print_value (Hashtbl.find vars output); print_newline () ) program.p_outputs;
-      (*List.iter (fun (addr, x) -> print_string ("--> "); print_value (Hashtbl.find ram x).(addr); print_newline () ) (List.rev !mem_map) ;*)
       print_module ram;
       update_mem();
       i := !i+1)
@@ -253,8 +240,8 @@ let main () =
     ["-n", Arg.Set_int number_steps, "Number of steps to simulate";
      "-d", Arg.Set_int delay, "Clock period";
      "-q", Arg.Set quiet, "Quiet mode";
-     "--print", Arg.Set_int print_address, "Définition d'un emplacement de ram pour le périphérique de sortie textuel";
-     "--time", Arg.Set_int time_address, "Définition d'un emplacement de ram pour le périphérique de sortie textuel"]
+     "--print-clock", Arg.Set_int print_address, "Définition d'un emplacement de ram pour le périphérique de sortie temporelle";
+     "--time", Arg.Set_int time_address, "Définition d'un emplacement de ram pour le périphérique de d'entrée temporelle"]
     compile
     ""
 ;;
