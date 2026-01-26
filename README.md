@@ -26,13 +26,9 @@ Le code produit peut alors être exécuté par le cpu ( à compiler au préalabl
 # Version de CPU avec pipeline
 Etant donné que le simulateur est difficile à utiliser pour montrer ce qu'il se passe cycle par cycle dans cpu_pipeline, test_pipeline est une version qui marche seulement pour démontrer le fonctionnement sans passer par le netlist_simulator (qui est séquentiel et non parallèle).
 Test_pipeline :
-Créer un fichier assembleur .s avec seulement addi, add, lw, sw, qui est du type:
-      addi x1, x0, 5
-      addi x2, x0, 3
-      add x3, x1, x2
-      sw x3, x0, 0
-Compiler: python3 compiler.py fichier.s
-Simuler: python3 test_pipeline.py
+Créer un fichier assembleur .s avec seulement addi, add, lw, sw par exemple les fichiers `test_forward.s` et `test_hazard.s`
+Compiler: `python3 compiler.py fichier.s` 
+Simuler: `python3 test_pipeline.py` (par défaut il prends le résultat qui a été mis dans compile.out )
 
 Si tout de même vous voulez tester cpu_pipeline.py:
 Compiler le circuit : `make cpu_pipeline`
@@ -41,5 +37,3 @@ Simuler le circuit : `make run`
 ## Lien du projet sur Github
 https://github.com/Fefe07/Sysnum_microprocessor
 
-## English
-The netlist encoding of a microprocessor made in group for a digital systems course in ENS Paris.
