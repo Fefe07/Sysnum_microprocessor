@@ -158,10 +158,10 @@ SP = 2
 RA = 1
 
 def call(offset):
-    jump(RA, offset)
+    return jump(RA, offset)
 
 def ret():
-    jump_reg(0, RA, 0)
+    return jump_reg(0, RA, 0)
 
 def print_prog(p):
     print()
