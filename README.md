@@ -38,5 +38,8 @@ Si tout de même vous voulez tester cpu_pipeline.py:
 Compiler le circuit : `make cpu_pipeline`
 Simuler le circuit : `make run` 
 
+## Lien du projet sur Github
+https://github.com/Fefe07/Sysnum_microprocessor
+
 ## English
 The netlist encoding of a microprocessor made in group for a digital systems course in ENS Paris.
