@@ -11,12 +11,9 @@ sim : $(SIMULATOR)
 all :
 	make alu log_unit arith_unit demux mux regs forwarding hazards
 
-update :
+$(SIMULATOR_DIR)/netlist_simulator.byte :
 	make -C $(SIMULATOR_DIR) build
-
-$(SIMULATOR):
-	make -C $(SIMULATOR_DIR) build
-
+	
 cpu_pipeline: cpu_pipeline.py
 	mkdir -p build
 	$(PYTHON_INTERPRETER) $(CAROTTE_PATH) -o ./build/cpu_pipeline.net ./cpu_pipeline.py
