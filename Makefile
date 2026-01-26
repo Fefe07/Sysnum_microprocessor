@@ -17,6 +17,14 @@ update :
 $(SIMULATOR):
 	make -C $(SIMULATOR_DIR) build
 
+cpu_pipeline: cpu_pipeline.py
+	mkdir -p build
+	$(PYTHON_INTERPRETER) $(CAROTTE_PATH) -o ./build/cpu_pipeline.net ./cpu_pipeline.py
+	cp ./build/cpu_pipeline.net ./build/current.net
+
+sim_pipeline : $(SIMULATOR)
+	$(SIMULATOR) -n 30 ./build/current.net
+
 clean :
 	rm -rf ./build/
 	rm -rf ./__pycache__/
