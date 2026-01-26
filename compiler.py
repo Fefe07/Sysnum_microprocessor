@@ -335,7 +335,7 @@ def compile(filename) :
 
         line, words = get_line_words(file_in)
 
-    #print_prog(program)
+    print_prog(program)
     print_prog_file(program,file_out)
 
     #print("Fin du fichier")
