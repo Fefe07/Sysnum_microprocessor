@@ -377,7 +377,7 @@ def compile(filename) :
     file_in.close()
 
 
-compile("compiler_test.ass")
+compile("clock.s")
 
 
 
