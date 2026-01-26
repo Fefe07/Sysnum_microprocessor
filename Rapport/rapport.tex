@@ -1,18 +1,17 @@
 \documentclass[11pt,a4paper]{article}
-\usepackage[utf8]{inputenc}
-\usepackage[T1]{fontenc}
 \usepackage[french]{babel}
 \usepackage{listings}
 \usepackage{xcolor}
 \usepackage{geometry}
 \usepackage{hyperref}
-\usepackage{booktabs}
 \usepackage{fancyhdr}
+
+\definecolor{jaune}{RGB}{190,160,0}
 
 \pagestyle{fancy}
 \fancyhf{}
-\rhead{Microprocesseur RISC-V}
-\lhead{Systèmes Numériques 2025 -2026}
+\lhead{\textbf{\color{jaune} Systèmes Numériques 2025--2026}}
+\rhead{\textbf{\color{jaune} Microprocesseur RISC-V}}
 \rfoot{\thepage}
 
 \lstdefinestyle{python}{
@@ -54,7 +53,7 @@
 
 \maketitle
 
-Ce rapport présente l'implémentation d'un microprocesseur RISC-V 32 bits. Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel. Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). Par ailleurs, la granularité mémoire est de 1 octet et la taille des mots de 4 octets, soit 32 bits.
+Ce rapport présente l'implémentation d'un microprocesseur RISC-V 32 bits. Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel. Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). 
 
 \section{Introduction}
 
@@ -82,22 +81,6 @@ Le processeur est décrit en Python à l'aide de la bibliothèque \texttt{lib\_c
 \subsection{Unité arithmétique et logique}
 L'\textbf{unité arithmétique (arith\_unit.py)} implémente l'addition et la soustraction sur $n$ bits. La soustraction $a - b$ est réalisée par $a + \overline{b} + 1$ (CA2).
 L'\textbf{ALU (alu.py)} combine quant à elle les opérations arithmétiques et logiques.
-\begin{table}[h]
-\centering
-\begin{tabular}{|c|c|c|l|}
-\hline
-000 & ADD & SUB & Addition / Soustraction \\
-001 & SLL & SUB & Shift Left Logical / Soustraction \\
-010 & AND & AND & ET logique \\
-011 & OR & OR & OU logique \\
-100 & XOR & XOR & OU exclusif \\
-101 & SLT & SLT & Set Less Than (signé) \\
-110 & SRL & SRA & Shift Right Logical / Arithmetic \\
-111 & SLTU & SLTU & Set Less Than (non signé) \\
-\hline
-\end{tabular}
-\end{table}
-\newpage
 \subsection{Drapeaux/Flags}
 Les drapeaux (flags.py) sont calculés pour les comparaisons et branchements conditionnels : Zero Flag (ZF), Carry/Borrow Flag (CF), Sign Flag (SF) et Negative Flag (NF).
 
@@ -144,20 +127,13 @@ Le code machine est généré dans le fichier \texttt{compile.out}, qui est mis 
 Nous avons essayé de développer une version pipelinée du processeur (cpu\_pipeline.py) dans le but d'améliorer les performances du microprocesseur déjà implémenté en exécutant plusieurs instructions en parallèle.\\
 
 Un pipeline divise l'exécution d'une instruction en plusieurs étages. Pendant qu'une instruction est dans un étage, une autre peut être dans l'étage précédent, et ainsi de suite. Cela permet théoriquement d'exécuter une instruction par cycle une fois le pipeline rempli. 
-\begin{enumerate}
-    \item \textbf{IF (Instruction Fetch)} : Lecture de l'instruction depuis la ROM à l'adresse pointée par le PC.
-    \item \textbf{ID (Instruction Decode)} : Décodage de l'instruction et lecture des registres sources rs1 et rs2.
-    \item \textbf{EX (Execute)} : Exécution de l'opération dans l'ALU et calcul des conditions de branchement.
-    \item \textbf{MEM (Memory)} : Accès à la RAM pour les instructions load et store.
-    \item \textbf{WB (Write Back)} : Écriture du résultat dans le registre destination.
-\end{enumerate}
 
 Entre chaque étage, des registres inter-étages (IF/ID, ID/EX, EX/MEM, MEM/WB) mémorisent les données nécessaires pour l'étage suivant.\\
 
 Le pipeline introduit des problèmes appelés \textit{aléas ou hazards}. Ce sont des situations où une instruction ne peut pas s'exécuter correctement car elle dépend d'une instruction précédente qui n'a pas encore terminé. Cela survient quand une instruction a besoin d'une donnée qui n'est pas encore disponible. Par exemple :
 \begin{lstlisting}[style=asm]
-    add x1, x2, x3    ; ecrit x1 au cycle 5 (WB)
-    sub x4, x1, x5    ; lit x1 au cycle 3 (ID) 
+    add x1, x2, x3
+    sub x4, x1, x5
 \end{lstlisting}
 Ici, l'instruction \texttt{sub} essaie de lire x1 alors que \texttt{add} ne l'a pas encore écrit. Sans correction, \texttt{sub} lirait une ancienne valeur de x1.
 
@@ -188,7 +164,7 @@ Pour générer et simuler le CPU avec pipeline :
 clock.s incrémente les secondes, minutes et heures.
 clock\_real\_time.s pemet d'avoir une horloge en temps réel.
 
-\section{Tests et  utilisation}
+\color{violet}\section{Tests et  utilisation}
 Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte :
 \begin{itemize}
     \item \texttt{Sysnum\_microprocessor}
@@ -211,16 +187,5 @@ compile("compiler\_test.ass")
 Le code produit est mis dans le fichier compile.out.\\
 
 Le code produit peut alors être exécuté par le CPU, en le lançant avec make cpu sim puis en indiquant l'emplacement du code à exécuter (./compile.out). \\
-
-\section{Conclusion}
-
-Ce projet a permis de concevoir :
-
-\begin{itemize}
-    \item Un processeur RISC-V 32 bits avec multiplicateur et diviseur
-    \item Un  compilateur qui traduit le code assembleur en binaire
-    \item Une horloge pour l'application
-    \item Une tentative de version de cpu pipelinée avec forwarding et gestion des hazards
-\end{itemize}
 
 \end{document}
