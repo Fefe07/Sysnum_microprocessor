@@ -154,23 +154,14 @@ def lui(dest, imm):
 def auipc(dest, imm):
     return get_instruction("u", imm_U = get_imm(imm, 20), rd = get_reg(dest), opcode = get_opcode("none", True, False, False, True, True))
 
-RSP = 2
-RAR = 1
-PC = 2**5 - 1 
-def push(reg):
-    [op_imm("add", RSP, RSP, 4),
-    store(RSP, 0, reg)]
-
-def pop(reg):
-    [load(reg, RSP, 0),
-    op_imm("add", RSP, -4)]
+SP = 2
+RA = 1
 
 def call(offset):
-    push(RAR) + [jump(RAR, offset)] + pop(RAR)
+    jump(RA, offset)
 
 def ret():
-    jump_reg(0, RAR, 0)
-
+    jump_reg(0, RA, 0)
 
 def print_prog(p):
     print()

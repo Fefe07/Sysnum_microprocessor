@@ -334,10 +334,6 @@ def compile(filename) :
                 match words[0], is_cst_1 :
                     case ("call", True) :
                         program.append(call(val_1))
-                    case("pop", False) :
-                        program.append(pop(val_1))
-                    case("push", False) :
-                        program.append(push(val_1))
                     case("j", True) :
                         program.append(jump(0,val_1))
 
