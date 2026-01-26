@@ -86,29 +86,29 @@ Les drapeaux (flags.py) sont calculés pour les comparaisons et branchements con
 
 \subsection{Multiplieur et diviseur}
 
-Le \textbf{multiplieur} (multiplier.py) effectue des multiplications signées et non signées sur 32 bits, produisant un résultat sur 64 bits. Le \textbf{diviseur} (divider.py) calcule le quotient et le reste pour des opérandes signés ou non signés.
+Le \textbf{multiplieur} (multiplier.py) effectue des multiplications signées et non signées sur 32 bits, produisant un résultat sur 64 bits. Le \textbf{diviseur} (divider.py) calcule le quotient et le reste pour des opérandes signés ou non signés. Leur ajout complexifie nettement la netlist, ce qui rend le lancement de la simulation assez long (eviron une minute). Par défaut, ils sont donc désactivés, mais peuvent être activés avec la modification d'une variable booléenne dans le fichier cpu.py. 
+
 \subsection{Registre}
 
 Le processeur dispose de 32 registres de 32 bits. Le registre x0 est à zéro. Il y a deux types de registre : un pour le CPU sans pipeline, qui intègre Program Counter (regs.py), et un conçu spécialement pour la pipeline et plus simple (regs\_pipeline.py).
 
 \section{Assembleur / Compilateur}
 
-Le compilateur (compiler.py) traduit le code assembleur RISC-V en code machine. Il effectue deux passes sur le fichier source : \\
-\textbf{1.} Le compilateur parcourt le fichier pour repérer tous les labels et mémoriser leur position (numéro de ligne de code). Les labels peuvent être nommésou numériques.
-\textbf{2:} Le compilateur génère le code machine instruction par instruction.
+Le compilateur (compiler.py) traduit le code assembleur RISC-V en code machine. Il est composé d'un parser, et d'une librairie générant les codes des instructions. Il effectue deux passes sur le fichier source : \\
+\begin{enumerate}
+\item Le compilateur parcourt le fichier pour repérer tous les labels et mémoriser leur position (numéro de ligne de code). Les labels peuvent être nommés ou numériques.
+\item Le compilateur génère le code machine instruction par instruction.
+\end{enumerate}
 
 \subsection{Utilisation du compilateur}
 
-Pour compiler un fichier assembleur, il faut modifier la dernière ligne de \texttt{compiler.py} pour appeler la fonction \texttt{compile} avec le chemin du fichier :
+Pour compiler un fichier assembleur, on utilise
 
-\begin{lstlisting}[style=python]
-if __name__ == "__main__":
-    compile("mon_programme.s")
+\begin{lstlisting}[language=Bash]
+python3 compiler.py file.s
 \end{lstlisting}
 
-Puis exécuter : \texttt{python3 compiler.py}
-
-Le code machine est généré dans le fichier \texttt{compile.out}, qui est mis dans la ROM du simulateur.
+Le code machine est généré dans le fichier \texttt{compile.out}, qui doit ensuite être mis dans la ROM du processeur, en entrant le chemin de ce fichier lorsque le simulateur demande le programme à charger.
 
 \subsection{Instructions}
 
@@ -167,8 +167,11 @@ Pour contourner les problèmes liés à cpu\_pipeline, nous avons un simulateur 
 \end{enumerate}
 
 \section{Horloge}
-clock.s incrémente les secondes, minutes et heures.
-clock\_real\_time.s pemet d'avoir une horloge en temps réel.
+
+Deux codes d'horloge ont été développés. Pour pouvoir afficher des nombres, nous avons préféré simulé des périphériques plutôt que d'afficher à chaque coup d'horloge le contenu d'un registre. Le simulateur de netlist permet donc de définir 64 bits un périphérique de sortie textuel. On écrit dans les 32 derniers bits la donnée à afficher, et ceux-ci seront affichés lorsqu'une valeur non nulle sera mise dans les 32 premiers bits.
+Les deux codes d'horloge utilise cette fonctionnalité. De plus pour l'horloge en temps réel, nous avions ajouté la possibilité de brider la fréquence du netlist. Nous avons finalement opté pour une autre option : simuler un périphérique d'horloge, qui donnerai le temps Unix en secondes. Ainsi, on peut définir 32 bits de la RAM comme contenant en permanence le temps. L'horloge en temps réel utilise cette fonctionnalité, et affiche donc toujours la bonne heure en UTC+0.
+
+Des exécutable clock et clock\_real\_time permettent de réaliser la compilation de l'assembleur et de lancer le simulateur avec les bonnes options. Notez qu'il faut activer le diviseur et le multiplieur poour l'horloge en temps réel.
 
 \color{violet}\section{Tests et  utilisation}
 Par défaut, les chemins sont correct si ces trois dossiers sont côte à côte :
