@@ -61,6 +61,14 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
 
 \begin{frame}{Compilateur}
 Le compilateur est divisé en deux parties : un lexer/parser qui lit les fichiers assembleurs, et qui apppelle la librairie qui donne le code binaire des instructions.
+
+Lexer et parser codés à la main en python.
+Choix techniques : 
+hyppothèse de gestion des labels : une instruction = une ligne de code produit
+
+Gestion des labels '1'-'9'
+
+
 \end{frame}
 
 \begin{frame}{Décodeur d'instructions}

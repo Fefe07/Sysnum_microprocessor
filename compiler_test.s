@@ -1,5 +1,5 @@
     j "main"
-test: 
+crash: 
     addi sp,sp,-16
     sw ra, 0(sp)
     addi a0, zero, 42
@@ -8,7 +8,7 @@ test:
     ret
 main:
     sw a0, 0(zero)
-    call "test"
+    call "crash"
     sw a0, 0(zero)
     mov x21, 42
     mov x20, 0
