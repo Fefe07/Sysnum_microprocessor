@@ -36,7 +36,9 @@
 \end{frame}
 \section{Introduction}
 \begin{frame}{Présentation}
-Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel.\\Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. \\Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). 
+Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel.\\Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. \\Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). \\
+Le processeur est décrit en Python à l'aide de la bibliothèque \texttt{lib\_carotte}, qui génère des netlists qui peuvent ensuite être simulées. Le processeur exécute une instruction complète à chaque cycle d'horloge.
+
 \end{frame}
 
 
@@ -74,7 +76,16 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
 \end{alertblock}
 \end{frame}
 \begin{frame}{RAM et instructions}
-
+\begin{itemize}
+    \item \textbf{Arithmétique :} add, addi, sub, mul, mulh, mulhu, mulhsu, div, divu, rem, remu
+    \item \textbf{Logique :} and, andi, or, ori, xor, xori
+    \item \textbf{Décalages :} sll, slli, srl, srli, sra, srai
+    \item \textbf{Comparaison :} slt, slti, sltu, sltui
+    \item \textbf{Mémoire :} lw, sw
+    \item \textbf{Branchements :} beq, bne, blt, bge, bltu, bgeu, bgt, ble, bgtu, bleu
+    \item \textbf{Sauts :} jal, jalr, j, jr
+    \item lui, auipc, mov, call, ret
+\end{itemize}
 \end{frame}
 
 \section{Compilation et décodage d'instructions}
@@ -87,7 +98,11 @@ Choix techniques :
 hypothèse de gestion des labels : une instruction = une ligne de code produit
 
 Gestion des labels '1'-'9'
-
+\begin{enumerate}
+\item Le compilateur parcourt le fichier pour repérer tous les labels et mémoriser leur position (numéro de ligne de code). Les labels peuvent être nommés ou numériques.
+\item Le compilateur génère le code machine instruction par instruction.
+\end{enumerate}
+Le code machine est généré dans le fichier \texttt{compile.out}, qui doit ensuite être mis dans la ROM du processeur, en entrant le chemin de ce fichier lorsque le simulateur demande le programme à charger.
 
 \end{frame}
 
@@ -275,17 +290,26 @@ L'horloge est écrit en assembleur et compilée par notre compilateur. Elle fait
 
 Pour contourner les problèmes liés à cpu\_pipeline, nous avons un simulateur simplifié qui supporte les instructions addi, add, lw, sw. 
 \begin{enumerate}
-    \item Créer un fichier assembleur .s
-    \item Compiler: python3 compiler.py fichier.s 
-    \item Simuler: python3 test\_pipeline.py
+    \item[$\checkmark$] Créer un fichier assembleur .s
+    \item[$\checkmark$] Compiler: python3 compiler.py fichier.s 
+    \item[$\checkmark$] Simuler: python3 test\_pipeline.py
 \end{enumerate}
 \end{frame}
 \section{Conclusion}
 \begin{frame}{Conclusion}
-\end{frame}
-\end{document}
+\textbf{Ce qu'on a réalisé :}
+\begin{itemize}
+    \item[$\checkmark$] CPU monocycle RISC-V 32 bits fonctionnel
+    \item[$\checkmark$] Multiplieur et diviseur
+    \item[$\checkmark$] Assembleur complet (gestion des labels)
+    \item[$\checkmark$] Horloge temps réel avec périphériques simulés
+    \item[$\checkmark$] Tentative de pipeline avec forwarding et hazards
+\end{itemize}
 
-\section{Conclusion}
-\begin{frame}{Conclusion}
+\textbf{Améliorations possibles :}
+\begin{itemize}
+    \item Finaliser le pipeline pour tous les programmes
+    \item Ajouter cache, prédiction de branchement
+\end{itemize}
 \end{frame}
 \end{document}
