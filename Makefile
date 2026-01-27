@@ -15,4 +15,4 @@ clean:
 	$(SIMULATOR_MAKE) clean
 	$(CPU_MAKE) clean
 
-.PHONY : clean
+.PHONY : clean build
