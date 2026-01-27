@@ -51,13 +51,13 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
 
 \begin{frame}{ALU}
 
-\begin{alertblock}{Flag inférieur}
-  \(NF = (SF \lor (a[n-1] \land \lnot b[n-1]) ) \land (a[n-1] \lor \lnot b[n-1])\)
+\begin{alertblock}{Flag inférieur non signé}
+  \(\text{LTU} = \lnot \text{carry}_{\text{out}}\)
 \end{alertblock}
-\end{frame}
 
-\begin{frame}{RAM et instructions}
-
+\begin{alertblock}{Flag inférieur signé}
+  \(\text{LT} = (SF \lor (a[n-1] \land \lnot b[n-1]) ) \land (a[n-1] \lor \lnot b[n-1])\)
+\end{alertblock}
 \end{frame}
 
 \begin{frame}{Multplieur et diviseur}
@@ -69,6 +69,9 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
                     = 2^{2n-2}a_{n-1}b_{n-1} + a_{[0:n-2]}\times b_{[0:n-2]} - 2^{n-1}(a_{n-1}b_{[0:n-2]} + b_{n-1}a_{[0:n-2]})
   \end{align*}
 \end{alertblock}
+\end{frame}
+\begin{frame}{RAM et instructions}
+
 \end{frame}
 
 \section{Compilation et décodage d'instructions}
