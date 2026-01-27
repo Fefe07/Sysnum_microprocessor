@@ -91,8 +91,153 @@ Les instructions sont représentées selon les conventions RISC-V :
 \end{frame}
 
 \section{Choix techniques faits}
-\begin{frame}{Pipeline} %Peut être à mettre dans la section au dessus
+\section{Pipeline}
+\begin{frame}{Principe}
+Problème du CPU monocycle : 1 instruction = 1 cycle complet\\
+L'idée du pipeline est de découper l'exécution en étages indépendants
+\begin{itemize}
+    \item \textbf{IF} : Fetch instruction depuis ROM
+    \item \textbf{ID} : Decode + lecture registres
+    \item \textbf{EX} : Calcul ALU
+    \item \textbf{MEM} : Accès RAM (LW/SW)
+    \item \textbf{WB} : Écriture résultat dans registre
+\end{itemize}
 \end{frame}
+
+\begin{frame}{But du pipeline : faire une exécution parallèle}
+On veut pourvoir faire plusieurs instructions en même temps\\
+Cas idéal:
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+ & IF& ID&EX& MEM& WB \\
+\hline
+1 & I1 & &  & & \\
+2 & I2 & I1 &  &  & \\
+3 & I3 & I2 & I1 & &  \\
+4 & I4 & I3 & I2 & I1 &  \\
+5 & I5 & I4 & I3 & I2 & I1 \\
+\hline
+\end{tabular}
+\end{center}
+Après remplissage on a  une instruction terminée par cycle\\
+Les registres inter-étages (IF/ID, ID/EX, EX/MEM, MEM/WB) permettent de stocker les données entre chaque étage
+\end{frame}
+
+\begin{frame}{Hazards/aléas de données}
+MAIS on a un problème quand une instruction utilise une valeur pas encore écrite
+\begin{center}
+add x1, x2, x3 \quad $\leftarrow$ écrit x1 au cycle 5 (WB)\\
+sub x4, x1, x5 \quad $\leftarrow$ lit x1 au cycle 3 (ID)
+\end{center}
+
+\vspace{0.3cm}
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+ & IF& ID&EX& MEM& WB \\
+\hline
+1 & ADD & &  &  &  \\
+2 & SUB & ADD & &  &  \\
+3 &  & \textcolor{red}{SUB lit x1} & ADD & & \\
+4 & &  & SUB & ADD &  \\
+5 &  &  & & SUB & \textcolor{red}{ADD écrit x1} \\
+\hline
+\end{tabular}
+\end{center}
+SUB lirait l'ancienne valeur de x1 
+\end{frame}
+\begin{frame}{Forwarding (forwarding.py)}
+le forwarding permettrait de transmettre le résultat directement sans attendre WB\\
+\textbf{Implémentation :}
+\begin{itemize}
+    \item Comparer rs1/rs2 avec rd des étages suivants
+    \item Priorité de EX/MEM sur MEM/WB (valeur plus récente)
+    \item Si match $\rightarrow$ utiliser résultat forwardé
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Problème du "Load-Use Hazard"}
+Il y a des cas où le forwarding ne suffit pas, par exemple :
+\begin{center}
+lw x1, 0(x2) \quad $\leftarrow$ donnée disponible après MEM\\
+add x3, x1, x4 \quad $\leftarrow$ besoin de x1 en EX
+\end{center}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+ & IF& ID & EX & MEM & WB \\
+\hline
+3 &  & ADD & LW &  & \\
+4 &  & & ADD & \textcolor{red}{LW lit RAM} &  \\
+\hline
+\end{tabular}
+\end{center}
+
+ADD en EX a besoin de x1, mais LW le lit en MEM au même cycle \\
+
+$\rightarrow$ Impossible de forwarder une donnée qui n'existe pas encore
+\end{frame}
+
+\begin{frame}{Solution no2 : Stall (hazards.py)}
+Le stall permet d'insérer une bulle (= attendre 1 cycle)
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|c|c|l|}
+\hline
+ & IF& ID & EX & MEM & WB \\
+\hline
+4 &  & ADD & LW &  & & \\
+5 &  & ADD & \textcolor{blue}{bulle} & LW & & \textbf{STALL} \\
+6 &  & & ADD &  & LW & forward ok \\
+\hline
+\end{tabular}
+\end{center}
+
+\textbf{Détection dans hazards.py :}
+
+\begin{itemize}
+    \item Si instruction en EX est un LW
+    \item Et instruction en ID utilise le même registre
+    \item $\rightarrow$ Bloquer IF et ID, insérer bulle en EX
+\end{itemize}
+\end{frame}
+
+\begin{frame}{Démonstration du forwarding}
+\textbf{Programme test\_forward.s :}
+\begin{center}
+addi x1, x0, 5    \quad$\rightarrow$  x1 = 5\\
+addi x2, x0, 3    \quad$\rightarrow$ x2 = 3\\
+\textcolor{red}{add x3, x1, x2}    \quad$\rightarrow$ x3 = x1 + x2 \\
+sw x3, x0, 0       \quad$\rightarrow$ mem[0] = x3
+\end{center}
+$\rightarrow$ x1 vient de MEM/WB, x2 vient de EX/MEM\\
+\textbf{Programme test\_hazard.s :}
+\begin{center}
+addi x1, x0, 42   \quad$\rightarrow$x1 = 42\\
+sw x1, x0, 0      \quad$\rightarrow$ mem[0] = 42\\
+lw x2, x0, 0     \quad$\rightarrow$ x2 = mem[0]\\
+add x3, x2, x1    \quad$\rightarrow$ x3 = x2 + x1 \textcolor{red}{(STALL)}\\
+\end{center}
+\end{frame}
+
+\begin{frame}{Détails de l'implémentation et limitations}
+\begin{itemize}
+    \item cpu\_pipeline.py : circuit complet qui génère la netlist du pipeline 5 étages
+    \item regs\_pipeline.py
+    \item hazards.py : Détection load-use hazard + insertion de stall
+    \item forwarding.py : Compare adresses rs1/rs2 avec rd en EX/MEM et MEM/WB et sélectionne la source (registre ou forward)
+\end{itemize}
+
+\textbf{Limites :}
+
+\begin{itemize}
+    \item Erreurs avec programmes complexes (clock)
+    \item Simulateur de Netlist OCaml : difficile de visualiser le parallélisme
+\end{itemize}
+test\_pipeline.py :  Simulateur simplifié de pipeline qui montre forwarding et stalls cycle par cycle (addi, add, lw, sw)
+
 
 \begin{frame}{Simulation de périphériques}
 Pour pouvoir afficher des nombres et avoir accès au temps, le processeur peut accéder à travers la RAM à des périphériques, simulés par le simulateur de netlist. Ces périphériques sont:
