@@ -30,7 +30,7 @@ def get_line_words(file_in) :
     # élimination des lignes blanches
     while words == [] : 
         line = file_in.readline()
-        print(line)
+        #print(line)
         while line == "" :
             line = file_in.readline()
             if not line :
@@ -82,7 +82,7 @@ def get_line_words(file_in) :
             words[i] = words[i].replace('t5', 'x30')
             words[i] = words[i].replace('t6', 'x31')
 
-    print(line)
+    #print(line)
     return line, words
     
 def get_val_from_label(label, labels, labels_num, n) :
@@ -106,8 +106,8 @@ def get_val_from_label(label, labels, labels_num, n) :
         elif label[1] == "b" :
             i = len(labels_num[k])-1 
             while i >=0 and labels_num[k][i] > n :
-                print("n = ", n)
-                print("labels_num[k][i] = ", labels_num[k][i])
+                #print("n = ", n)
+                #print("labels_num[k][i] = ", labels_num[k][i])
                 i -= 1
             if i == -1:
                 print("pas de label ", k, " avant")
@@ -155,10 +155,10 @@ def compile(filename) :
 
         line,words = get_line_words(file_in)
     file_in.close()
-    print("labels :")
-    print(labels)
-    print("labels_num :")
-    print(labels_num)
+    #print("labels :")
+    #print(labels)
+    #print("labels_num :")
+    #print(labels_num)
 
 
     ## Second passge : construction du programme 
@@ -381,9 +381,9 @@ def compile(filename) :
 
     file_in.close()
 
-if __name__ == "__main__":
-    compile("compiler_test.s")
+#if __name__ == "__main__":
+#    compile("compiler_test.s")
 
-# if __name__ == "__main__":
-#     compile(sys.argv[1])
+if __name__ == "__main__":
+    compile(sys.argv[1])
 
