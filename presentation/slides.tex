@@ -2,6 +2,7 @@
 
 \usepackage[french]{babel}
 \usepackage{datetime}
+\usepackage{graphicx}
 
 \usetheme{CambridgeUS}
 
@@ -10,6 +11,8 @@
 \setbeamercolor*{palette primary}{use=yellow,fg=yellow.fg,bg=yellow.bg}
 \setbeamercolor*{palette secondary}{use=yellow,fg=yellow.fg!75,bg=yellow.bg!75}
 \setbeamercolor*{palette tertiary}{use=purple,fg=purple.fg,bg=purple.bg}
+\setbeamercolor*{block title alerted}{use=purple,fg=purple.fg,bg=purple.bg}
+\setbeamercolor*{block body alerted}{use=yellow, fg=yellow.fg,bg=yellow.bg!80}
 \setbeamercolor*{titlelike}{use=yellow,fg=yellow.fg, bg=yellow.bg}
 \setbeamercolor*{frametitle}{use=yellow, bg=yellow.bg!20,fg=yellow.fg}
 \setbeamercolor*{structure}{use=purple, fg=purple.fg, bg=purple.bg}
@@ -48,6 +51,9 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
 
 \begin{frame}{ALU}
 
+\begin{alertblock}{Flag inférieur}
+  \(NF = (SF \lor (a[n-1] \land \lnot b[n-1]) ) \land (a[n-1] \lor \lnot b[n-1])\)
+\end{alertblock}
 \end{frame}
 
 \begin{frame}{RAM et instructions}
@@ -55,6 +61,14 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
 \end{frame}
 
 \begin{frame}{Multplieur et diviseur}
+\begin{alertblock}{Equations du multiplieur}
+  Non-signé : \( \text{MUL(a,b)} = a_0\times b + 2\times a_{[1:]}\times b \)\\
+  Signé :
+  \begin{align*}
+    \text{MUL(a,b)} = (-2^{n-1}a_{n-1} + a_{[0:n-2]})\times (-2^{n-1}b_{n-1} + b_{[0:n-2]})\\  
+                    = 2^{2n-2}a_{n-1}b_{n-1} + a_{[0:n-2]}\times b_{[0:n-2]} - 2^{n-1}(a_{n-1}b_{[0:n-2]} + b_{n-1}a_{[0:n-2]})
+  \end{align*}
+\end{alertblock}
 \end{frame}
 
 \section{Compilation et décodage d'instructions}
@@ -72,6 +86,8 @@ Gestion des labels '1'-'9'
 \end{frame}
 
 \begin{frame}{Décodeur d'instructions}
+Les instructions sont représentées selon les conventions RISC-V :
+\includegraphics[width = 0.7\textwidth]{instruction_formats.png}
 \end{frame}
 
 \section{Choix techniques faits}
