@@ -48,7 +48,7 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
 
 \begin{frame}{ALU}
 
-\end{}
+\end{frame}
 
 \begin{frame}{RAM et instructions}
 
@@ -71,11 +71,18 @@ Le compilateur est divisé en deux parties : un lexer/parser qui lit les fichier
 \end{frame}
 
 \begin{frame}{Simulation de périphériques}
+Pour pouvoir afficher des nombres et avoir accès au temps, le processeur peut accéder à travers la RAM à des périphériques, simulés par le simulateur de netlist. Ces périphériques sont:
+\begin{itemize}
+\item Afficheur de date et heure
+\item Horloge donnant le temps Unix
+\end{itemize}
 \end{frame}
 
+\section{Horloge}
+\begin{frame}{Fonctionnement de l'horloge}
+L'horloge est écrit en assembleur et compilée par notre compilateur. Elle fait usage de l'ensemble des fonctionnalités de notre processeur: ALU, branchements conditionnels et inconditionnels, utilisation de nombreux registres, du multplieur, du diviseur, des labels du compilateur, et simulation de périphériques.
 
-\section{Simulation d'horloge}
-\begin{frame}{A faire}
+
 \end{frame}
 
 \section{Conclusion}
