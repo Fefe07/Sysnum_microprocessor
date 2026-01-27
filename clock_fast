@@ -1,0 +1,4 @@
+#!/bin/sh
+make build &&
+  python3 compiler.py clock_fast.s &&
+  echo "compile.out" | ./simulator/netlist_simulator.byte --print-clock 0 -q ./netlist_cpu/build/cpu.net

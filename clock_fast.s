@@ -1,0 +1,33 @@
+  addi x1, x0, 1
+  addi x2, x0, 1
+  addi x3, x0, 1
+  addi x4, x0, 1970
+  addi x5, x0, 0
+  addi x6, x0, 0,
+  addi x7, x0, 0
+  addi x8, x0, 60
+  addi x9, x0, 24
+  sw x2, x0, 4
+  sw x3, x0, 8
+  sw x4, x0, 12
+  sw x5, x0, 16
+  sw x6, x0, 20
+1:
+  sw x7, x0, 24
+  sw x1, x0, 0
+  addi x7, x7, 1
+  bne x7, x8, "1b"
+  addi x7, x0, 0
+  addi x6, x6, 1
+  sw x6, x0, 20
+  bne x6, x8, "1b"
+  addi x6, x0, 0
+  sw x6, x0, 20
+  addi x5, x5, 1
+  sw x5, x0, 16
+  bne x9, x5, "1b"
+  addi x5, x0, 0
+  sw x5, x0, 16
+  addi x2, x2, 1
+  sw x2, x0, 4
+  jal x0, "1b"
