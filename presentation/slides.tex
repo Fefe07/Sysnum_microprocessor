@@ -31,11 +31,14 @@
 \begin{document}
 
 \frame{\titlepage}
-
-\section{Introduction}
 \begin{frame}{Plan}
 \tableofcontents
 \end{frame}
+\section{Introduction}
+\begin{frame}{Présentation}
+Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel.\\Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. \\Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). 
+\end{frame}
+
 
 \section{Architecture du processeur}
 \begin{frame}{Composants du processeur} 
@@ -259,6 +262,28 @@ L'horloge est écrit en assembleur et compilée par notre compilateur. Elle fait
 \begin{frame}{Démonstration de l'horloge}
 
 \end{frame}
+\section{Utilisation}
+\begin{frame}{Utilisation}
+\begin{itemize}
+    \item compiler un circuit circuit.py avec : make circuit
+    \item lancer la simulation du dernier ciruit compilé avec : make sim 
+    \item  compiler puis simuler avec circuit.py : make circuit sim
+    \item make cpu : compile le CPU monocycle
+    \item make cpu\_pipeline : compile le CPU pipeliné
+    \item pour supprimer les fichiers produits par make : make clean
+\end{itemize}
+
+Pour contourner les problèmes liés à cpu\_pipeline, nous avons un simulateur simplifié qui supporte les instructions addi, add, lw, sw. 
+\begin{enumerate}
+    \item Créer un fichier assembleur .s
+    \item Compiler: python3 compiler.py fichier.s 
+    \item Simuler: python3 test\_pipeline.py
+\end{enumerate}
+\end{frame}
+\section{Conclusion}
+\begin{frame}{Conclusion}
+\end{frame}
+\end{document}
 
 \section{Conclusion}
 \begin{frame}{Conclusion}
