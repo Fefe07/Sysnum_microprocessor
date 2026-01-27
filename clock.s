@@ -10,10 +10,11 @@
   mul x11, x12, x23
   mul x19, x17, x11
   mul x20, x18, x11
+  lw x2, x0, 28
+  addi x28, x2, 0
 8:
   addi x4, x0, 1970
   addi x5, x0, 1
-  lw x2, x0, 28
 1:
   rem x25, x4, x14
   beq x25, x0, "2f"
@@ -108,7 +109,7 @@
   rem x2, x2, x12 
   div x8, x2, x13
   rem x9, x2, x13
-
+  addi x2, x28, 0
 7:
   sw x6, x0, 4 
   sw x5, x0, 8
@@ -119,6 +120,7 @@
   sw x1, x0, 0
 9:
   addi x9, x9, 1
+  addi x2, x2, 1
   blt x9, x13, "7b"
   addi x9, x0, 0
   addi x8, x8, 1
