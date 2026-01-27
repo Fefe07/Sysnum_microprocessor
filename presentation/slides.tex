@@ -37,7 +37,7 @@
 \section{Introduction}
 \begin{frame}{Présentation}
 Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel.\\Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. \\Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). \\
-Le processeur est décrit en Python à l'aide de la bibliothèque \texttt{lib\_carotte}, qui génère des netlists qui peuvent ensuite être simulées. Le processeur exécute une instruction complète à chaque cycle d'horloge.
+Le processeur est décrit en Python à l'aide de la bibliothèque \texttt{carotte.py}, qui génère des netlists qui peuvent ensuite être simulées. Le processeur exécute une instruction complète à chaque cycle d'horloge.
 
 \end{frame}
 
@@ -52,6 +52,10 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
   \item RAM avec granularité de 4 octets
   \item Multiplieur et diviseur
 \end{enumerate}
+\end{frame}
+
+\begin{frame}{Schéma du processeur}
+  \includegraphics[width=\linewidth]{schema.png}
 \end{frame}
 
 \begin{frame}{ALU}
@@ -111,7 +115,6 @@ Les instructions sont représentées selon les conventions RISC-V :
 \includegraphics[width = 0.7\textwidth]{instruction_formats.png}
 \end{frame}
 
-\section{Choix techniques faits}
 \section{Pipeline}
 \begin{frame}{Principe}
 Problème du CPU monocycle : 1 instruction = 1 cycle complet\\
@@ -260,6 +263,8 @@ add x3, x2, x1    \quad$\rightarrow$ x3 = x2 + x1 \textcolor{red}{(STALL)}\\
 test\_pipeline.py :  Simulateur simplifié de pipeline qui montre forwarding et stalls cycle par cycle (addi, add, lw, sw)
 \end{frame}
 
+\section{Horloge}
+
 \begin{frame}{Simulation de périphériques}
 Pour pouvoir afficher des nombres et avoir accès au temps, le processeur peut accéder à travers la RAM à des périphériques, simulés par le simulateur de netlist. Ces périphériques sont:
 \begin{itemize}
@@ -268,7 +273,6 @@ Pour pouvoir afficher des nombres et avoir accès au temps, le processeur peut a
 \end{itemize}
 \end{frame}
 
-\section{Horloge}
 \begin{frame}{Fonctionnement de l'horloge}
 L'horloge est écrit en assembleur et compilée par notre compilateur. Elle fait usage de l'ensemble des fonctionnalités de notre processeur: ALU, branchements conditionnels et inconditionnels, utilisation de nombreux registres, du multplieur, du diviseur, des labels du compilateur, et simulation de périphériques.
 
