@@ -36,7 +36,7 @@
 \end{frame}
 \section{Introduction}
 \begin{frame}{Présentation}
-Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur/compilateur, et des programmes de démonstration dont une horloge temps réel.\\Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. \\Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). \\
+Le projet comprend un CPU, une tentative de CPU pipelinée, un assembleur, et des programmes de démonstration dont une horloge temps réel.\\Le microprocesseur est simulé grâce à un simulateur de netlists en OCaml. \\Le code et la mémoire du processus partagent des espaces d'adressage séparés (architecture de Harvard). \\
 Le processeur est décrit en Python à l'aide de la bibliothèque \texttt{carotte.py}, qui génère des netlists qui peuvent ensuite être simulées. Le processeur exécute une instruction complète à chaque cycle d'horloge.
 
 \end{frame}
@@ -44,7 +44,7 @@ Le processeur est décrit en Python à l'aide de la bibliothèque \texttt{carott
 
 \section{Architecture du processeur}
 \begin{frame}{Composants du processeur} 
-Le processeur manipule des mots de 32 bits et est petit-boutiste.
+Le processeur manipule des mots de 32 bits.
 \begin{enumerate}
   \item ALU
   \item Décodeur d'instructions
@@ -92,10 +92,10 @@ Le processeur manipule des mots de 32 bits et est petit-boutiste.
 \end{itemize}
 \end{frame}
 
-\section{Compilation et décodage d'instructions}
+\section{Assembleur et décodage d'instructions}
 
-\begin{frame}{Compilateur}
-Le compilateur est divisé en deux parties : un lexer/parser qui lit les fichiers assembleurs, et qui apppelle la librairie qui donne le code binaire des instructions.
+\begin{frame}{Assembleur}
+L'assembleur est divisé en deux parties : un lexer/parser qui lit les fichiers assembleurs, et qui appelle la librairie qui donne le code binaire des instructions.
 
 Lexer et parser codés à la main en python.
 Choix techniques : 
@@ -103,8 +103,8 @@ hypothèse de gestion des labels : une instruction = une ligne de code produit
 
 Gestion des labels '1'-'9'
 \begin{enumerate}
-\item Le compilateur parcourt le fichier pour repérer tous les labels et mémoriser leur position (numéro de ligne de code). Les labels peuvent être nommés ou numériques.
-\item Le compilateur génère le code machine instruction par instruction.
+\item L'assembleur parcourt le fichier pour repérer tous les labels et mémoriser leur position (numéro de ligne de code). Les labels peuvent être nommés ou numériques.
+\item L'assembleur génère le code machine instruction par instruction.
 \end{enumerate}
 Le code machine est généré dans le fichier \texttt{compile.out}, qui doit ensuite être mis dans la ROM du processeur, en entrant le chemin de ce fichier lorsque le simulateur demande le programme à charger.
 
@@ -274,7 +274,7 @@ Pour pouvoir afficher des nombres et avoir accès au temps, le processeur peut a
 \end{frame}
 
 \begin{frame}{Fonctionnement de l'horloge}
-L'horloge est écrit en assembleur et compilée par notre compilateur. Elle fait usage de l'ensemble des fonctionnalités de notre processeur: ALU, branchements conditionnels et inconditionnels, utilisation de nombreux registres, du multplieur, du diviseur, des labels du compilateur, et simulation de périphériques.
+L'horloge est écrit en assembleur et compilée par notre assembleur. Elle fait usage de l'ensemble des fonctionnalités de notre processeur: ALU, branchements conditionnels et inconditionnels, utilisation de nombreux registres, du multplieur, du diviseur, des labels de l'assembleur, et simulation de périphériques.
 
 \end{frame}
 
